@@ -50,6 +50,33 @@ function formatDate(value: string) {
   })
 }
 
+function ZoomLinksCell({ schedule }: { schedule: ScheduleRow }) {
+  const links = [
+    { label: 'Pra', href: safeHttpUrl(schedule.zoom_link_pra) },
+    { label: 'Pengamatan', href: safeHttpUrl(schedule.zoom_link_pengamatan) },
+    { label: 'Pasca', href: safeHttpUrl(schedule.zoom_link_pasca) },
+  ].filter((l) => l.href)
+
+  if (links.length === 0) return <span className="text-slate-400 font-body text-xs">—</span>
+
+  return (
+    <div className="flex flex-wrap gap-1.5">
+      {links.map((l) => (
+        <a
+          key={l.label}
+          href={l.href!}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 font-body text-xs font-semibold hover:bg-amber-50 hover:text-amber-700 transition"
+        >
+          <Video className="w-3 h-3" />
+          {l.label}
+        </a>
+      ))}
+    </div>
+  )
+}
+
 function getActivePhase(schedule: ScheduleRow, todayIso: string): 'pra' | 'saat' | 'pasca' {
   if (schedule.status === 'selesai') return 'pasca'
   if (schedule.scheduled_date === todayIso) return 'saat'
@@ -177,6 +204,9 @@ export default async function GuruJadwalPage() {
                         Supervisor
                       </th>
                       <th className="font-body font-semibold text-white/80 text-left px-5 md:px-6 py-3.5">
+                        Meeting
+                      </th>
+                      <th className="font-body font-semibold text-white/80 text-left px-5 md:px-6 py-3.5">
                         Status
                       </th>
                     </tr>
@@ -200,6 +230,9 @@ export default async function GuruJadwalPage() {
                           </td>
                           <td className="px-5 md:px-6 py-4 font-body text-slate-700">
                             {s.supervisor_name ?? <span className="text-slate-400">—</span>}
+                          </td>
+                          <td className="px-5 md:px-6 py-4">
+                            <ZoomLinksCell schedule={s} />
                           </td>
                           <td className="px-5 md:px-6 py-4">
                             <span
