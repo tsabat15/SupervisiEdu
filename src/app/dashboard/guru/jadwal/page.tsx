@@ -247,7 +247,7 @@ function ScheduleCard({ schedule, todayIso }: { schedule: ScheduleRow; todayIso:
     >
       {isToday && (
         <div className="mb-3 -mx-5 -mt-4 px-5 py-2 bg-amber-50 rounded-t-xl border-b border-amber-200">
-          <p className="font-body text-xs font-semibold text-amber-700">⚡ Supervisi Hari Ini</p>
+          <p className="font-body text-xs font-semibold text-amber-700">Supervisi Hari Ini</p>
         </div>
       )}
 
