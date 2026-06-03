@@ -74,7 +74,11 @@ export default function LaporanForm({ mode, initialData, guruOptions, jadwalOpti
         }
         router.push(`/dashboard/kepsek/laporan/${result.id}`)
       } else {
-        const result = await updateLaporan({ ...buildPayload(), id: initialData!.id })
+        if (!initialData?.id) {
+          setError('Laporan tidak ditemukan.')
+          return
+        }
+        const result = await updateLaporan({ ...buildPayload(), id: initialData.id })
         if (result.error) {
           setError(result.error)
           return
