@@ -59,6 +59,16 @@ function formatDate(iso: string) {
   })
 }
 
+function validateHttpUrl(raw: string | null | undefined): string | null {
+  if (!raw) return null
+  try {
+    const u = new URL(raw)
+    return u.protocol === 'http:' || u.protocol === 'https:' ? u.href : null
+  } catch {
+    return null
+  }
+}
+
 export async function createSchedule(
   payload: SchedulePayload,
 ): Promise<{ id?: string; error?: string }> {
@@ -80,9 +90,9 @@ export async function createSchedule(
     subject: payload.subject.trim(),
     class_name: payload.class_name.trim(),
     notes: payload.notes?.trim() || null,
-    zoom_link_pra: payload.zoom_link_pra?.trim() || null,
-    zoom_link_pengamatan: payload.zoom_link_pengamatan?.trim() || null,
-    zoom_link_pasca: payload.zoom_link_pasca?.trim() || null,
+    zoom_link_pra: validateHttpUrl(payload.zoom_link_pra?.trim()),
+    zoom_link_pengamatan: validateHttpUrl(payload.zoom_link_pengamatan?.trim()),
+    zoom_link_pasca: validateHttpUrl(payload.zoom_link_pasca?.trim()),
     status: 'dijadwalkan' satisfies ScheduleStatus,
   }
   const { data, error } = (await supabase
@@ -142,9 +152,9 @@ export async function updateSchedule(
     subject: payload.subject.trim(),
     class_name: payload.class_name.trim(),
     notes: payload.notes?.trim() || null,
-    zoom_link_pra: payload.zoom_link_pra?.trim() || null,
-    zoom_link_pengamatan: payload.zoom_link_pengamatan?.trim() || null,
-    zoom_link_pasca: payload.zoom_link_pasca?.trim() || null,
+    zoom_link_pra: validateHttpUrl(payload.zoom_link_pra?.trim()),
+    zoom_link_pengamatan: validateHttpUrl(payload.zoom_link_pengamatan?.trim()),
+    zoom_link_pasca: validateHttpUrl(payload.zoom_link_pasca?.trim()),
     updated_at: new Date().toISOString(),
   }
 

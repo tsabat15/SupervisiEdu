@@ -36,6 +36,16 @@ interface Props {
   guruOptions: GuruOption[]
 }
 
+function safeHttpUrl(raw: string | null | undefined): string | null {
+  if (!raw) return null
+  try {
+    const u = new URL(raw)
+    return u.protocol === 'http:' || u.protocol === 'https:' ? u.href : null
+  } catch {
+    return null
+  }
+}
+
 const STATUS_BADGE: Record<ScheduleStatus, { label: string; className: string }> = {
   dijadwalkan: {
     label: 'Dijadwalkan',
@@ -368,9 +378,9 @@ function ConfirmDialog({
 
 function ZoomLinkButtons({ schedule }: { schedule: Schedule }) {
   const links = [
-    { key: 'pra', label: 'Pra', href: schedule.zoom_link_pra },
-    { key: 'pengamatan', label: 'Pengamatan', href: schedule.zoom_link_pengamatan },
-    { key: 'pasca', label: 'Pasca', href: schedule.zoom_link_pasca },
+    { key: 'pra', label: 'Pra', href: safeHttpUrl(schedule.zoom_link_pra) },
+    { key: 'pengamatan', label: 'Pengamatan', href: safeHttpUrl(schedule.zoom_link_pengamatan) },
+    { key: 'pasca', label: 'Pasca', href: safeHttpUrl(schedule.zoom_link_pasca) },
   ].filter((l) => l.href)
 
   if (links.length === 0) return <span className="text-slate-300 text-xs">—</span>
