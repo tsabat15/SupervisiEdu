@@ -150,7 +150,7 @@ export async function publishLaporan(id: string): Promise<{ error?: string }> {
 
   const { data: existing } = (await supabase
     .from('supervision_reports')
-    .select('supervisor_id, teacher_id, subject, class_name')
+    .select('supervisor_id, teacher_id, subject, class_name, status')
     .eq('id', id)
     .single()) as unknown as {
     data: {
@@ -158,11 +158,13 @@ export async function publishLaporan(id: string): Promise<{ error?: string }> {
       teacher_id: string
       subject: string
       class_name: string
+      status: ReportStatus
     } | null
   }
 
   if (!existing) return { error: 'Laporan tidak ditemukan.' }
   if (existing.supervisor_id !== userId) return { error: 'Anda tidak memiliki akses ke laporan ini.' }
+  if (existing.status === 'submitted') return {}
 
   const { error } = await supabase
     .from('supervision_reports')
