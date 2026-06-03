@@ -35,7 +35,7 @@ export default async function AdminProfilPage() {
           </p>
         </header>
 
-        <main className="px-4 py-6 md:px-8 md:py-8 max-w-3xl mx-auto w-full">
+        <main className="px-4 py-6 md:px-8 md:py-8 max-w-3xl mx-auto w-full space-y-5">
           <section className="bg-white rounded-xl border border-slate-200 shadow-sm">
             <div className="px-5 md:px-6 py-4 border-b border-slate-100 flex items-center gap-4">
               <AvatarInitials name={profile.full_name} size="lg" />
