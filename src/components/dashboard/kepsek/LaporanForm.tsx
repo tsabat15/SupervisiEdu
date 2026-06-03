@@ -46,7 +46,7 @@ export default function LaporanForm({ mode, initialData, guruOptions, jadwalOpti
   const [scheduleId, setScheduleId] = useState(initialData?.schedule_id ?? '')
 
   function buildPayload(): LaporanPayload {
-    const parsedScore = scoreStr.trim() !== '' ? parseInt(scoreStr, 10) : null
+    const parsedScore = scoreStr.trim() !== '' ? Number(scoreStr) : null
     return {
       teacher_id: teacherId,
       visit_date: visitDate,

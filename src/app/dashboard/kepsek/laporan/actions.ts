@@ -61,8 +61,10 @@ export async function createLaporan(
   if (!payload.visit_date) return { error: 'Tanggal kunjungan wajib diisi.' }
   if (!payload.subject.trim()) return { error: 'Mata pelajaran wajib diisi.' }
   if (!payload.class_name.trim()) return { error: 'Kelas wajib diisi.' }
-  if (payload.score !== null && payload.score !== undefined && (payload.score < 0 || payload.score > 100)) {
-    return { error: 'Nilai harus antara 0 dan 100.' }
+  if (payload.score !== null && payload.score !== undefined) {
+    if (!Number.isFinite(payload.score) || payload.score < 0 || payload.score > 100) {
+      return { error: 'Nilai harus berupa angka antara 0 dan 100.' }
+    }
   }
 
   const supabase = await createServerClient()
@@ -102,8 +104,10 @@ export async function updateLaporan(
   if (!payload.visit_date) return { error: 'Tanggal kunjungan wajib diisi.' }
   if (!payload.subject.trim()) return { error: 'Mata pelajaran wajib diisi.' }
   if (!payload.class_name.trim()) return { error: 'Kelas wajib diisi.' }
-  if (payload.score !== null && payload.score !== undefined && (payload.score < 0 || payload.score > 100)) {
-    return { error: 'Nilai harus antara 0 dan 100.' }
+  if (payload.score !== null && payload.score !== undefined) {
+    if (!Number.isFinite(payload.score) || payload.score < 0 || payload.score > 100) {
+      return { error: 'Nilai harus berupa angka antara 0 dan 100.' }
+    }
   }
 
   const supabase = await createServerClient()
@@ -139,6 +143,8 @@ export async function updateLaporan(
 
   revalidatePath('/dashboard/kepsek/laporan')
   revalidatePath(`/dashboard/kepsek/laporan/${payload.id}`)
+  revalidatePath('/dashboard/guru/laporan')
+  revalidatePath(`/dashboard/guru/laporan/${payload.id}`)
   return {}
 }
 

@@ -62,6 +62,14 @@ export default async function GuruLaporanDetailPage({
   } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
+  const { data: profile } = (await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()) as unknown as { data: { role: string } | null }
+
+  if (!profile || profile.role !== 'guru') redirect('/dashboard')
+
   const { data: laporan } = (await supabase
     .from('supervision_reports')
     .select('*')
