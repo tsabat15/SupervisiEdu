@@ -1,4 +1,6 @@
+import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
+import { ArrowLeft } from 'lucide-react'
 import { createServerClient } from '@/src/utils/supabase/server'
 import KepsekSidebar from '@/src/components/dashboard/kepsek/KepsekSidebar'
 import LaporanForm from '@/src/components/dashboard/kepsek/LaporanForm'
@@ -121,6 +123,15 @@ export default async function KepsekLaporanDetailPage({
         </header>
 
         <main className="px-4 py-6 md:px-8 md:py-8 max-w-3xl mx-auto w-full space-y-5">
+          <div className="mb-1">
+            <Link
+              href="/dashboard/kepsek/laporan"
+              className="inline-flex items-center gap-1.5 font-body text-sm text-slate-500 hover:text-slate-800 transition"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Kembali ke Laporan Supervisi
+            </Link>
+          </div>
           <div className="bg-white rounded-xl border border-slate-200 shadow-sm px-5 md:px-6 py-5">
             <h2 className="font-heading text-sm font-bold text-[#002147] mb-4">Edit Laporan</h2>
             <LaporanForm
