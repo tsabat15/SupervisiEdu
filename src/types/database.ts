@@ -114,6 +114,7 @@ export interface Database {
           recommendations: string | null
           score: number | null
           status: ReportStatus
+          instrument_type: string
           created_at: string
           updated_at: string
         }
@@ -130,6 +131,7 @@ export interface Database {
           recommendations?: string | null
           score?: number | null
           status?: ReportStatus
+          instrument_type?: string
           created_at?: string
           updated_at?: string
         }
@@ -145,6 +147,7 @@ export interface Database {
           recommendations?: string | null
           score?: number | null
           status?: ReportStatus
+          instrument_type?: string
           updated_at?: string
         }
       }

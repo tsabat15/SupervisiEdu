@@ -5,6 +5,8 @@ import { createServerClient } from '@/src/utils/supabase/server'
 import { createAdminClient } from '@/src/utils/supabase/admin'
 import type { ReportStatus } from '@/src/types/database'
 
+export type InstrumentType = 'administrasi' | 'modul_ajar' | 'pelaksanaan'
+
 export interface LaporanPayload {
   teacher_id: string
   visit_date: string
@@ -15,6 +17,7 @@ export interface LaporanPayload {
   recommendations?: string | null
   score?: number | null
   schedule_id?: string | null
+  instrument_type?: InstrumentType
 }
 
 async function requireKepsek(): Promise<{ userId?: string; error?: string }> {
@@ -79,6 +82,7 @@ export async function createLaporan(
     recommendations: payload.recommendations?.trim() || null,
     score: payload.score ?? null,
     schedule_id: payload.schedule_id || null,
+    instrument_type: payload.instrument_type ?? 'pelaksanaan',
     status: 'draft' satisfies ReportStatus,
   }
 
@@ -131,6 +135,7 @@ export async function updateLaporan(
     recommendations: payload.recommendations?.trim() || null,
     score: payload.score ?? null,
     schedule_id: payload.schedule_id || null,
+    instrument_type: payload.instrument_type ?? 'pelaksanaan',
     updated_at: new Date().toISOString(),
   }
 

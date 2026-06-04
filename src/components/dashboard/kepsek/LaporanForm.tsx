@@ -7,6 +7,7 @@ import {
   createLaporan,
   updateLaporan,
   type LaporanPayload,
+  type InstrumentType,
 } from '@/src/app/dashboard/kepsek/laporan/actions'
 import type { SupervisionReport } from '@/src/types/database'
 
@@ -44,6 +45,9 @@ export default function LaporanForm({ mode, initialData, guruOptions, jadwalOpti
   const [recommendations, setRecommendations] = useState(initialData?.recommendations ?? '')
   const [scoreStr, setScoreStr] = useState(initialData?.score?.toString() ?? '')
   const [scheduleId, setScheduleId] = useState(initialData?.schedule_id ?? '')
+  const [instrumentType, setInstrumentType] = useState<InstrumentType>(
+    (initialData?.instrument_type as InstrumentType) ?? 'pelaksanaan',
+  )
 
   function buildPayload(): LaporanPayload {
     const parsedScore = scoreStr.trim() !== '' ? Number(scoreStr) : null
@@ -56,6 +60,7 @@ export default function LaporanForm({ mode, initialData, guruOptions, jadwalOpti
       improvements: improvements.trim() || null,
       recommendations: recommendations.trim() || null,
       score: parsedScore,
+      instrument_type: instrumentType,
       schedule_id: scheduleId || null,
     }
   }
@@ -165,6 +170,21 @@ export default function LaporanForm({ mode, initialData, guruOptions, jadwalOpti
             required
             className={inputCls}
           />
+        </div>
+
+        <div>
+          <label className={labelCls}>
+            Jenis Instrumen <span className="text-red-500">*</span>
+          </label>
+          <select
+            value={instrumentType}
+            onChange={(e) => setInstrumentType(e.target.value as InstrumentType)}
+            className={inputCls}
+          >
+            <option value="pelaksanaan">Penilaian Pelaksanaan Pembelajaran</option>
+            <option value="administrasi">Telaah Administrasi Pembelajaran</option>
+            <option value="modul_ajar">Telaah Modul Ajar</option>
+          </select>
         </div>
 
         <div>

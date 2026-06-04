@@ -14,6 +14,7 @@ interface LaporanRow {
   visit_date: string
   score: number | null
   status: SupervisionReport['status']
+  instrument_type: string
 }
 
 export default async function KepsekLaporanPage() {
@@ -36,7 +37,7 @@ export default async function KepsekLaporanPage() {
 
   const { data: rawReports } = (await supabase
     .from('supervision_reports')
-    .select('id, teacher_id, subject, class_name, visit_date, score, status')
+    .select('id, teacher_id, subject, class_name, visit_date, score, status, instrument_type')
     .eq('supervisor_id', user.id)
     .order('visit_date', { ascending: false })) as unknown as {
     data:
@@ -48,6 +49,7 @@ export default async function KepsekLaporanPage() {
           visit_date: string
           score: number | null
           status: SupervisionReport['status']
+          instrument_type: string
         }[]
       | null
   }
@@ -74,6 +76,7 @@ export default async function KepsekLaporanPage() {
     visit_date: r.visit_date,
     score: r.score,
     status: r.status,
+    instrument_type: r.instrument_type,
   }))
 
   return (

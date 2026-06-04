@@ -5,6 +5,19 @@ import { useRouter } from 'next/navigation'
 import { FilePlus, FileText } from 'lucide-react'
 import type { ReportStatus } from '@/src/types/database'
 
+const INSTRUMENT_SHORT: Record<string, string> = {
+  pelaksanaan: 'Pelaksanaan',
+  administrasi: 'Administrasi',
+  modul_ajar: 'Modul Ajar',
+}
+
+function getPredikat(score: number): string {
+  if (score >= 91) return 'SB'
+  if (score >= 81) return 'B'
+  if (score >= 71) return 'C'
+  return 'K'
+}
+
 interface LaporanRow {
   id: string
   teacher_name: string | null
@@ -13,6 +26,7 @@ interface LaporanRow {
   visit_date: string
   score: number | null
   status: ReportStatus
+  instrument_type: string
 }
 
 interface Props {
@@ -45,15 +59,18 @@ function ScoreBadge({ score }: { score: number | null }) {
   if (score === null) {
     return <span className="font-body text-xs text-slate-400">—</span>
   }
+  const predikat = getPredikat(score)
   const cls =
-    score >= 80
+    predikat === 'SB'
       ? 'bg-emerald-50 text-emerald-700'
-      : score >= 60
+      : predikat === 'B'
+      ? 'bg-blue-50 text-blue-700'
+      : predikat === 'C'
       ? 'bg-amber-50 text-amber-700'
       : 'bg-red-50 text-red-700'
   return (
     <span className={`inline-block font-body text-xs font-semibold px-2.5 py-0.5 rounded-full ${cls}`}>
-      {score}
+      {score} <span className="opacity-70">({predikat})</span>
     </span>
   )
 }
@@ -106,13 +123,14 @@ export default function KepsekLaporanClient({ initialReports }: Props) {
         </div>
       ) : (
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-x-auto">
-          <table className="w-full min-w-[640px] text-sm">
+          <table className="w-full min-w-[760px] text-sm">
             <thead>
               <tr className="bg-[#002147]">
                 <th className="font-body font-semibold text-white/80 text-left px-5 md:px-6 py-3.5">Guru</th>
                 <th className="font-body font-semibold text-white/80 text-left px-5 md:px-6 py-3.5">Mata Pelajaran</th>
                 <th className="font-body font-semibold text-white/80 text-left px-5 md:px-6 py-3.5">Kelas</th>
                 <th className="font-body font-semibold text-white/80 text-left px-5 md:px-6 py-3.5">Tanggal</th>
+                <th className="font-body font-semibold text-white/80 text-left px-5 md:px-6 py-3.5">Jenis</th>
                 <th className="font-body font-semibold text-white/80 text-left px-5 md:px-6 py-3.5">Nilai</th>
                 <th className="font-body font-semibold text-white/80 text-left px-5 md:px-6 py-3.5">Status</th>
               </tr>
@@ -132,6 +150,9 @@ export default function KepsekLaporanClient({ initialReports }: Props) {
                     <td className="px-5 md:px-6 py-4 font-body text-slate-700">{r.subject}</td>
                     <td className="px-5 md:px-6 py-4 font-body text-slate-700">{r.class_name}</td>
                     <td className="px-5 md:px-6 py-4 font-body text-slate-600">{formatDate(r.visit_date)}</td>
+                    <td className="px-5 md:px-6 py-4 font-body text-slate-600 text-xs">
+                      {INSTRUMENT_SHORT[r.instrument_type] ?? 'Pelaksanaan'}
+                    </td>
                     <td className="px-5 md:px-6 py-4">
                       <ScoreBadge score={r.score} />
                     </td>

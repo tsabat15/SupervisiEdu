@@ -14,17 +14,25 @@ function formatDate(value: string) {
   })
 }
 
+function getPredikat(score: number): { label: string; singkat: string; cls: string } {
+  if (score >= 91) return { label: 'Sangat Baik', singkat: 'SB', cls: 'bg-emerald-50 text-emerald-700 border-emerald-200' }
+  if (score >= 81) return { label: 'Baik', singkat: 'B', cls: 'bg-blue-50 text-blue-700 border-blue-200' }
+  if (score >= 71) return { label: 'Cukup', singkat: 'C', cls: 'bg-amber-50 text-amber-700 border-amber-200' }
+  return { label: 'Kurang', singkat: 'K', cls: 'bg-red-50 text-red-700 border-red-200' }
+}
+
+const INSTRUMENT_LABEL: Record<string, string> = {
+  pelaksanaan: 'Penilaian Pelaksanaan Pembelajaran',
+  administrasi: 'Telaah Administrasi Pembelajaran',
+  modul_ajar: 'Telaah Modul Ajar',
+}
+
 function ScoreDisplay({ score }: { score: number | null }) {
   if (score === null) return <span className="font-body text-slate-400">Tidak ada nilai</span>
-  const cls =
-    score >= 80
-      ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-      : score >= 60
-      ? 'bg-amber-50 text-amber-700 border-amber-200'
-      : 'bg-red-50 text-red-700 border-red-200'
+  const predikat = getPredikat(score)
   return (
     <div
-      className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl border-2 ${cls}`}
+      className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl border-2 ${predikat.cls}`}
     >
       <span className="font-heading text-2xl font-bold">{score}</span>
     </div>
@@ -99,6 +107,9 @@ export default async function GuruLaporanDetailPage({
           <p className="font-body text-xs md:text-sm text-slate-500 mt-0.5">
             {formatDate(laporan.visit_date)} · Oleh {supervisor?.full_name ?? '—'}
           </p>
+          <p className="font-body text-xs text-slate-400 mt-0.5">
+            {INSTRUMENT_LABEL[laporan.instrument_type] ?? 'Penilaian Pelaksanaan Pembelajaran'}
+          </p>
         </header>
 
         <main className="px-4 py-6 md:px-8 md:py-8 max-w-3xl mx-auto w-full space-y-4">
@@ -106,15 +117,19 @@ export default async function GuruLaporanDetailPage({
             <ScoreDisplay score={laporan.score} />
             <div>
               <p className="font-body text-xs text-slate-500">Nilai Supervisi</p>
-              <p className="font-heading text-sm font-bold text-slate-900 mt-0.5">
-                {laporan.score !== null
-                  ? laporan.score >= 80
-                    ? 'Sangat Baik'
-                    : laporan.score >= 60
-                    ? 'Cukup Baik'
-                    : 'Perlu Peningkatan'
-                  : 'Belum dinilai'}
-              </p>
+              {laporan.score !== null ? (
+                <>
+                  <p className="font-heading text-sm font-bold text-slate-900 mt-0.5">
+                    {getPredikat(laporan.score).label}{' '}
+                    <span className="text-slate-400">({getPredikat(laporan.score).singkat})</span>
+                  </p>
+                  <p className="font-body text-xs text-slate-400 mt-0.5">
+                    Skala: SB ≥91 · B ≥81 · C ≥71 · K &lt;71
+                  </p>
+                </>
+              ) : (
+                <p className="font-heading text-sm font-bold text-slate-500 mt-0.5">Belum dinilai</p>
+              )}
             </div>
           </div>
 
