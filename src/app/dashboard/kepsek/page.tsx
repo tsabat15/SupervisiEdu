@@ -53,8 +53,9 @@ export default async function KepsekDashboardPage() {
   const today = new Date()
   const weekAhead = new Date()
   weekAhead.setDate(today.getDate() + 7)
-  const sixMonthsAgo = new Date()
-  sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6)
+  const windowStart = new Date()
+  windowStart.setMonth(windowStart.getMonth() - 5)
+  windowStart.setDate(1)
 
   const [
     { data: profile },
@@ -78,7 +79,8 @@ export default async function KepsekDashboardPage() {
     supabase
       .from('supervision_reports')
       .select('*', { count: 'exact', head: true })
-      .eq('status', 'approved'),
+      .eq('status', 'approved')
+      .eq('supervisor_id', user.id),
     supabase
       .from('rmp_forms')
       .select('id, judul, status, updated_at, guru_id')
@@ -89,7 +91,8 @@ export default async function KepsekDashboardPage() {
       .from('supervision_reports')
       .select('visit_date, score')
       .eq('supervisor_id', user.id)
-      .not('score', 'is', null),
+      .not('score', 'is', null)
+      .gte('visit_date', isoDate(windowStart)),
   ])) as unknown as [
     { data: { full_name: string } | null },
     { count: number | null },
@@ -150,7 +153,7 @@ export default async function KepsekDashboardPage() {
 
   // Proses MonthlyTrend — 6 bulan terakhir
   const scored = rawLaporanChart ?? []
-  const sixMonthsAgoStr = isoDate(sixMonthsAgo)
+  const sixMonthsAgoStr = isoDate(windowStart)
 
   const monthMap = new Map<string, { total: number; count: number }>()
   for (const r of scored) {
