@@ -11,10 +11,10 @@ const quickLinks = [
 ]
 
 const contacts = [
-  { Icon: MapPin, text: 'Jl. Pendidikan No. 1, Jakarta Pusat, DKI Jakarta 10110' },
-  { Icon: Phone, text: '+62 21 1234 5678' },
-  { Icon: Mail, text: 'info@supervisi.edu.id' },
-  { Icon: Globe, text: 'www.supervisi.edu.id' },
+  { Icon: MapPin, text: 'Jl. Kapten Rahmad Buddin, Terjun, Kec. Medan Marelan, Kota Medan, Sumatera Utara 20255' },
+  { Icon: Phone, text: '0811-6040-1901' },
+  { Icon: Mail, text: 'sman16medan@gmail.com' },
+  { Icon: Globe, text: 'sman16medan.com' },
 ]
 
 export default function Footer() {
@@ -26,9 +26,11 @@ export default function Footer() {
           {/* Brand & Contact */}
           <div>
             <p className="font-heading text-xl font-bold text-white mb-2">SupervisiEdu</p>
+            <p className="font-body text-xs text-amber-400 mb-1">SMA Negeri 16 Medan</p>
             <p className="font-body text-sm text-slate-400 leading-relaxed mb-6">
-              Platform digital supervisi pendidikan yang membantu meningkatkan kualitas
-              belajar mengajar secara terstruktur, transparan, dan berbasis data.
+              Platform digital supervisi pembelajaran yang membantu kepala sekolah
+              memantau, mengevaluasi, dan meningkatkan kualitas mengajar guru secara
+              terstruktur dan berbasis data.
             </p>
             <ul className="space-y-3">
               {contacts.map(({ Icon, text }) => (
@@ -66,14 +68,14 @@ export default function Footer() {
             </h3>
             <div className="rounded-xl overflow-hidden h-52 shadow-lg ring-1 ring-slate-700">
               <iframe
-                src="https://maps.google.com/maps?q=Jakarta+Pusat,+DKI+Jakarta,+Indonesia&output=embed&z=13"
+                src="https://maps.google.com/maps?q=SMA+Negeri+16+Medan,+Jl+Kapten+Rahmad+Buddin,+Medan+Marelan,+Medan&output=embed&z=15"
                 width="100%"
                 height="100%"
                 style={{ border: 0 }}
                 allowFullScreen
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
-                title="Lokasi SupervisiEdu di Jakarta Pusat"
+                title="Lokasi SMA Negeri 16 Medan"
               />
             </div>
           </div>
@@ -82,10 +84,10 @@ export default function Footer() {
 
         <div className="mt-12 pt-6 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="font-body text-xs text-slate-500">
-            © 2026 SupervisiEdu. Hak Cipta Dilindungi.
+            © 2026 SupervisiEdu · SMA Negeri 16 Medan. Hak Cipta Dilindungi.
           </p>
           <p className="font-body text-xs text-slate-500">
-            Dikembangkan untuk kemajuan pendidikan Indonesia
+            Dikembangkan untuk kemajuan pendidikan SMA Negeri 16 Medan
           </p>
         </div>
       </div>

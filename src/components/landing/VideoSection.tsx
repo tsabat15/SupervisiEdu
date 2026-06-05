@@ -16,14 +16,14 @@ export default function VideoSection() {
 
         <div className="text-center mb-12">
           <p className="font-body text-sm font-semibold text-amber-400 uppercase tracking-widest mb-3">
-            Demo Platform
+            Video Profil
           </p>
           <h2 className="font-heading text-3xl lg:text-4xl font-bold text-white mb-4">
-            Lihat Platform Beraksi
+            Profil SMA Negeri 16 Medan
           </h2>
           <p className="font-body text-slate-400 text-base max-w-xl mx-auto leading-relaxed">
-            Tonton video demo singkat untuk memahami bagaimana SupervisiEdu membantu
-            meningkatkan kualitas supervisi pendidikan secara efisien.
+            Kenali lebih dekat SMA Negeri 16 Medan — sekolah unggulan dengan tradisi prestasi
+            akademik dan non-akademik yang membanggakan sejak 1985.
           </p>
         </div>
 

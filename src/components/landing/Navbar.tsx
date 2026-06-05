@@ -5,8 +5,9 @@ import Link from 'next/link'
 
 const navLinks = [
   { label: 'Tentang', href: '#tentang' },
-  { label: 'Fitur', href: '#fitur' },
+  { label: 'Alur Supervisi', href: '#alur' },
   { label: 'Berita', href: '#berita' },
+  { label: 'Kontak', href: '#kontak' },
 ]
 
 export default function Navbar() {

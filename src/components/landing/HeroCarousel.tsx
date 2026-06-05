@@ -7,21 +7,21 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 const slides = [
   {
     image: 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=1600&q=80',
-    title: 'Sistem Supervisi\nPendidikan Terpadu',
+    title: 'Sistem Supervisi Digital\nSMA Negeri 16 Medan',
     subtitle:
-      'Tingkatkan transparansi dan kualitas pendidikan melalui pemantauan data waktu nyata.',
+      'Platform pengelolaan supervisi pembelajaran yang transparan, terstruktur, dan berbasis data untuk kemajuan mutu pendidikan.',
   },
   {
     image: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=1600&q=80',
-    title: 'Pantau Proses\nBelajar Mengajar',
+    title: 'Pantau Kualitas\nBelajar Mengajar',
     subtitle:
-      'Observasi kelas yang terstruktur dan terintegrasi dalam satu platform digital yang mudah digunakan.',
+      'Observasi kelas terstruktur dengan instrumen penilaian terstandar — dari pra konferensi hingga refleksi akhir.',
   },
   {
     image: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=1600&q=80',
-    title: 'Tingkatkan Mutu\nPendidikan Indonesia',
+    title: 'Berkarakter, Berprestasi,\nSiap di Era Global',
     subtitle:
-      'Analisis data supervisi untuk pengambilan keputusan berbasis bukti yang lebih baik dan berkelanjutan.',
+      'Mewujudkan visi SMA Negeri 16 Medan melalui peningkatan kompetensi guru yang berkelanjutan dan terukur.',
   },
 ]
 
