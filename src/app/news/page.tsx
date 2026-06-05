@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { ArrowLeft, Calendar, Tag } from 'lucide-react'
 import Navbar from '@/src/components/landing/Navbar'
 import Footer from '@/src/components/landing/Footer'
+import DeveloperCard from '@/src/components/DeveloperCard'
 
 const news = [
   {
@@ -155,6 +156,7 @@ export default function NewsPage() {
       </section>
 
       <Footer />
+      <DeveloperCard />
     </div>
   )
 }

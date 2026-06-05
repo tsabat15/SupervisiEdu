@@ -6,6 +6,7 @@ import NewsSection from '@/src/components/landing/NewsSection'
 import VideoSection from '@/src/components/landing/VideoSection'
 import SupervisiTabSection from '@/src/components/landing/SupervisiTabSection'
 import Footer from '@/src/components/landing/Footer'
+import DeveloperCard from '@/src/components/DeveloperCard'
 
 export default function LandingPage() {
   return (
@@ -20,6 +21,7 @@ export default function LandingPage() {
         <SupervisiTabSection />
       </main>
       <Footer />
+      <DeveloperCard />
     </>
   )
 }
