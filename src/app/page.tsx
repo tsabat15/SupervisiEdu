@@ -4,7 +4,7 @@ import AboutSection from '@/src/components/landing/AboutSection'
 import TimelineSection from '@/src/components/landing/TimelineSection'
 import NewsSection from '@/src/components/landing/NewsSection'
 import VideoSection from '@/src/components/landing/VideoSection'
-import FeaturesGrid from '@/src/components/landing/FeaturesGrid'
+import SupervisiTabSection from '@/src/components/landing/SupervisiTabSection'
 import Footer from '@/src/components/landing/Footer'
 
 export default function LandingPage() {
@@ -17,7 +17,7 @@ export default function LandingPage() {
         <TimelineSection />
         <NewsSection />
         <VideoSection />
-        <FeaturesGrid />
+        <SupervisiTabSection />
       </main>
       <Footer />
     </>

@@ -27,7 +27,7 @@ export async function createUser(data: {
     email,
     role: data.role,
     nip,
-  })
+  } as never)
 
   if (profileError) {
     await supabase.auth.admin.deleteUser(authData.user.id)

@@ -109,18 +109,6 @@ export default function SupervisiCharts({ monthlyTrend, predikatData }: Props) {
               tickLine={false}
             />
             <Tooltip content={<CustomTooltip />} cursor={{ fill: '#f1f5f9' }} />
-            <ReferenceLine
-              y={81}
-              stroke="#3b82f6"
-              strokeDasharray="4 2"
-              label={{ value: 'B', fontSize: 10, fill: '#3b82f6', position: 'insideRight' }}
-            />
-            <ReferenceLine
-              y={71}
-              stroke="#f59e0b"
-              strokeDasharray="4 2"
-              label={{ value: 'C', fontSize: 10, fill: '#f59e0b', position: 'insideRight' }}
-            />
             <Bar dataKey="avg" fill="#FFC600" radius={[4, 4, 0, 0]} maxBarSize={40} />
           </BarChart>
         </ResponsiveContainer>

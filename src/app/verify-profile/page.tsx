@@ -9,6 +9,7 @@ import type { UserRole, Profile } from '@/src/types/database'
 const ROLE_LABEL: Record<UserRole, string> = {
   guru: 'Guru',
   kepsek: 'Kepala Sekolah',
+  admin: 'Administrator',
 }
 
 const ROLES: { value: UserRole; label: string }[] = [
