@@ -6,7 +6,6 @@ import {
   XAxis,
   YAxis,
   Tooltip,
-  ReferenceLine,
   ResponsiveContainer,
   PieChart,
   Pie,
@@ -31,6 +30,14 @@ interface Props {
   predikatData: PredikatCount[]
 }
 
+function getPredikat(avg: number): { name: string; label: string; color: string } | null {
+  if (avg <= 0) return null
+  if (avg >= 91) return { name: 'SB', label: 'Sangat Baik', color: '#10b981' }
+  if (avg >= 81) return { name: 'B', label: 'Baik', color: '#3b82f6' }
+  if (avg >= 71) return { name: 'C', label: 'Cukup', color: '#f59e0b' }
+  return { name: 'K', label: 'Kurang', color: '#ef4444' }
+}
+
 function CustomTooltip({
   active,
   payload,
@@ -42,6 +49,7 @@ function CustomTooltip({
 }) {
   if (!active || !payload?.length) return null
   const d = payload[0].payload
+  const predikat = getPredikat(d.avg)
   return (
     <div className="bg-white border border-slate-200 rounded-lg px-3 py-2 shadow-sm">
       <p className="font-body text-xs font-semibold text-slate-700">{label}</p>
@@ -49,6 +57,11 @@ function CustomTooltip({
         Rata-rata:{' '}
         <span className="font-semibold text-slate-800">{d.avg > 0 ? d.avg : '—'}</span>
       </p>
+      {predikat && (
+        <p className="font-body text-xs mt-0.5 font-semibold" style={{ color: predikat.color }}>
+          {predikat.name} — {predikat.label}
+        </p>
+      )}
       {d.count > 0 && (
         <p className="font-body text-xs text-slate-400">{d.count} laporan</p>
       )}
