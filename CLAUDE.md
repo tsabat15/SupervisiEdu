@@ -1,1 +1,12 @@
-@AGENTS.md
+## UI Inspiration: Eikra Style Adaptation
+- **Main Theme:** Referensi gaya visual dari 'Eikra - Education WordPress Theme.jfif'.
+- **Color Implementation:**
+  - Sidebar/Navbar: Solid Deep Navy (#002147 - mirip Eikra).
+  - Cards: Gunakan background putih bersih dengan border tipis 1px warna emas atau biru transparan.
+  - Primary Buttons: Gradasi Emas (#FFC600 ke #F7A800).
+- **Component Layout:**
+  - Landing Page: Ikuti struktur hero section dengan 'Quick Access' cards yang memiliki icon berwarna emas di dalamnya.
+  - Dashboard: Transformasikan gaya 'Featured Courses' grid menjadi 'Supervision Statistics' grid.
+- **Micro-details:**
+  - Gunakan ikon yang solid dan berwarna emas untuk setiap kategori layanan.
+  - Tambahkan 'Hover Effect' pada kartu berupa shadow yang lebih dalam dan border warna emas yang lebih cerah.

@@ -39,3 +39,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Claude Code & Superpowers (local tooling)
+.claude/
+.superpowers/
+docs/superpowers/
