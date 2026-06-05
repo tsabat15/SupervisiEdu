@@ -16,14 +16,14 @@ export default function VideoSection() {
 
         <div className="text-center mb-12">
           <p className="font-body text-sm font-semibold text-amber-400 uppercase tracking-widest mb-3">
-            Video Profil
+            Demo Platform
           </p>
           <h2 className="font-heading text-3xl lg:text-4xl font-bold text-white mb-4">
-            Profil SMA Negeri 16 Medan
+            Lihat Platform Beraksi
           </h2>
           <p className="font-body text-slate-400 text-base max-w-xl mx-auto leading-relaxed">
-            Kenali lebih dekat SMA Negeri 16 Medan — sekolah unggulan dengan tradisi prestasi
-            akademik dan non-akademik yang membanggakan sejak 1985.
+            Tonton video demo singkat untuk memahami bagaimana platform supervisi ini membantu
+            meningkatkan kualitas pembelajaran di SMA Negeri 16 Medan secara efisien.
           </p>
         </div>
 
@@ -51,7 +51,7 @@ export default function VideoSection() {
             <div className="absolute inset-0">
               {/* Thumbnail */}
               <img
-                src="https://images.unsplash.com/photo-1588702547919-26089e690ecc?w=1200&q=80"
+                src="https://sman16medan.com/assets/img/kegiatanpembelajaran.jpg"
                 alt="Video thumbnail"
                 className="w-full h-full object-cover"
               />

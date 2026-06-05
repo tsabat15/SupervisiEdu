@@ -3,7 +3,7 @@ import { ArrowRight } from 'lucide-react'
 
 const news = [
   {
-    image: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=600&q=80',
+    image: 'https://sman16medan.com/assets/img/olimpiade.jpg',
     category: 'Prestasi',
     date: '18 November 2024',
     title: 'Tim Olimpiade Matematika Raih Medali Emas Provinsi',
@@ -11,7 +11,7 @@ const news = [
       'Siswa SMA Negeri 16 Medan berhasil meraih Medali Emas pada ajang Olimpiade Matematika tingkat Provinsi Sumatera Utara, mengharumkan nama sekolah di kancah kompetisi akademik.',
   },
   {
-    image: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=600&q=80',
+    image: 'https://sman16medan.com/assets/img/kunjunganindustri.jpg',
     category: 'Kegiatan',
     date: '15 November 2024',
     title: 'Kunjungan Industri ke Perusahaan Teknologi',
@@ -19,7 +19,7 @@ const news = [
       'Siswa kelas XI program MIPA dan IPS mengikuti kunjungan industri ke perusahaan teknologi terkemuka sebagai bagian dari penguatan wawasan dunia kerja dan industri.',
   },
   {
-    image: 'https://images.unsplash.com/photo-1529070538774-1843cb3265df?w=600&q=80',
+    image: 'https://sman16medan.com/assets/img/lombadebat.jpg',
     category: 'Prestasi',
     date: '12 November 2024',
     title: 'Juara 1 Lomba Debat Bahasa Inggris',

@@ -52,7 +52,7 @@ export default function AboutSection() {
           <div>
             <div className="relative h-72 lg:h-96 rounded-2xl overflow-hidden shadow-xl mb-6">
               <img
-                src="https://images.unsplash.com/photo-1571260899304-425eee4c7efc?w=800&q=80"
+                src="https://sman16medan.com/assets/img/gedungsma.jpg"
                 alt="SMA Negeri 16 Medan"
                 className="w-full h-full object-cover"
               />
