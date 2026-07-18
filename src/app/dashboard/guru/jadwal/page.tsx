@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { Calendar, CheckCircle2, Clock, Video, XCircle } from 'lucide-react'
+import { Calendar, CheckCircle2, Clock, Target, Video, XCircle } from 'lucide-react'
 import { createServerClient } from '@/src/utils/supabase/server'
 import GururSidebar from '@/src/components/dashboard/guru/GururSidebar'
 import type { Schedule, ScheduleStatus } from '@/src/types/database'
@@ -255,6 +255,40 @@ export default async function GuruJadwalPage() {
   )
 }
 
+function KontrakBlock({ schedule }: { schedule: ScheduleRow }) {
+  const fokus = Array.isArray(schedule.kontrak_fokus) ? schedule.kontrak_fokus : []
+  const catatan = schedule.kontrak_catatan?.trim()
+  if (fokus.length === 0 && !catatan) return null
+
+  return (
+    <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50/60 px-3 py-2.5">
+      <div className="flex items-center gap-1.5 mb-1.5">
+        <Target className="w-3.5 h-3.5 text-amber-600" />
+        <p className="font-body text-[11px] font-semibold text-amber-700 uppercase tracking-wide">
+          Fokus Observasi (Kontrak)
+        </p>
+      </div>
+      {fokus.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 mb-1.5">
+          {fokus.map((f) => (
+            <span
+              key={f}
+              className="inline-block font-body text-[11px] font-medium text-amber-800 bg-amber-100 rounded-full px-2 py-0.5"
+            >
+              {f}
+            </span>
+          ))}
+        </div>
+      )}
+      {catatan && (
+        <p className="font-body text-xs text-slate-600 leading-relaxed whitespace-pre-wrap">
+          {catatan}
+        </p>
+      )}
+    </div>
+  )
+}
+
 function ScheduleCard({ schedule, todayIso }: { schedule: ScheduleRow; todayIso: string }) {
   const badge = STATUS_BADGE[schedule.status]
   const { Icon, color } = STATUS_ICON[schedule.status]
@@ -307,6 +341,8 @@ function ScheduleCard({ schedule, todayIso }: { schedule: ScheduleRow; todayIso:
               {schedule.notes}
             </p>
           )}
+
+          <KontrakBlock schedule={schedule} />
 
           {/* Phase Timeline */}
           <div className="mt-3">

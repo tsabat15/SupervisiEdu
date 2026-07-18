@@ -21,6 +21,7 @@ import {
   type SchedulePayload,
 } from '@/src/app/dashboard/kepsek/jadwal/actions'
 import type { Schedule, ScheduleStatus } from '@/src/types/database'
+import { SECTIONS, SECTION_SHORT_LABEL } from '@/src/lib/laporan-rubrik'
 
 interface GuruOption {
   id: string
@@ -424,8 +425,16 @@ function ScheduleFormModal({
   const [zoomLinkPra, setZoomLinkPra] = useState(editing?.zoom_link_pra ?? '')
   const [zoomLinkPengamatan, setZoomLinkPengamatan] = useState(editing?.zoom_link_pengamatan ?? '')
   const [zoomLinkPasca, setZoomLinkPasca] = useState(editing?.zoom_link_pasca ?? '')
+  const [kontrakFokus, setKontrakFokus] = useState<string[]>(editing?.kontrak_fokus ?? [])
+  const [kontrakCatatan, setKontrakCatatan] = useState(editing?.kontrak_catatan ?? '')
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
+
+  function toggleFokus(label: string) {
+    setKontrakFokus((prev) =>
+      prev.includes(label) ? prev.filter((l) => l !== label) : [...prev, label],
+    )
+  }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -441,6 +450,8 @@ function ScheduleFormModal({
       zoom_link_pra: zoomLinkPra || null,
       zoom_link_pengamatan: zoomLinkPengamatan || null,
       zoom_link_pasca: zoomLinkPasca || null,
+      kontrak_fokus: kontrakFokus.length > 0 ? kontrakFokus : null,
+      kontrak_catatan: kontrakCatatan || null,
     }
 
     startTransition(async () => {
@@ -601,6 +612,63 @@ function ScheduleFormModal({
               className={`${inputClass} resize-y leading-relaxed`}
             />
           </Field>
+
+          {/* ── Kontrak Pra-Konferensi (SPVC-02) ─────────────────────────────── */}
+          <div className="border-t border-slate-100 pt-4">
+            <p className="font-body text-xs font-semibold text-slate-500 uppercase tracking-wide">
+              Kontrak Pra-Konferensi
+            </p>
+            <p className="font-body text-xs text-slate-400 mt-1 mb-3">
+              Sepakati fokus observasi bersama guru sebelum pengamatan. Aspek yang dipilih menjadi
+              titik perhatian utama saat penilaian.
+            </p>
+
+            <p className="font-body text-xs font-medium text-slate-600 mb-2">Fokus Observasi</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {SECTIONS.map((section) => {
+                const label = SECTION_SHORT_LABEL[section.id] ?? section.id
+                const checked = kontrakFokus.includes(label)
+                return (
+                  <button
+                    type="button"
+                    key={section.id}
+                    onClick={() => toggleFokus(label)}
+                    disabled={isPending}
+                    className={`flex items-center gap-2.5 text-left rounded-lg border px-3 py-2 transition disabled:opacity-50 ${
+                      checked
+                        ? 'border-amber-400 bg-amber-50 ring-1 ring-amber-300'
+                        : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
+                    }`}
+                  >
+                    <span
+                      className={`flex items-center justify-center w-[18px] h-[18px] rounded shrink-0 border transition ${
+                        checked
+                          ? 'bg-amber-400 border-amber-400 text-slate-900'
+                          : 'border-slate-300 bg-white text-transparent'
+                      }`}
+                    >
+                      <Check className="w-3 h-3" strokeWidth={3} />
+                    </span>
+                    <span className="font-body text-xs font-medium text-slate-700">{label}</span>
+                  </button>
+                )
+              })}
+            </div>
+
+            <div className="mt-3">
+              <Field label="Kesepakatan / Catatan Kontrak (opsional)" htmlFor="sch-kontrak-catatan">
+                <textarea
+                  id="sch-kontrak-catatan"
+                  value={kontrakCatatan ?? ''}
+                  onChange={(e) => setKontrakCatatan(e.target.value)}
+                  disabled={isPending}
+                  rows={2}
+                  placeholder="Contoh: Fokus pada peningkatan fasilitasi bernalar kritis siswa."
+                  className={`${inputClass} resize-y leading-relaxed`}
+                />
+              </Field>
+            </div>
+          </div>
 
           {error && (
             <div className="rounded-lg bg-red-50 border border-red-200 px-3 py-2">

@@ -2,29 +2,41 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { CheckCircle2, Loader2, RotateCcw } from 'lucide-react'
+import { Check, CheckCircle2, Loader2, RotateCcw } from 'lucide-react'
 import { reviewRmp, type ReviewDecision } from '@/src/app/dashboard/kepsek/rmp/actions'
+import { ADMIN_CEKLIS_ITEMS, ADMIN_CEKLIS_TOTAL } from '@/src/lib/rmp-ceklis'
 
 interface Props {
   rmpId: string
   currentStatus: 'submitted' | 'revision' | 'approved'
   initialCatatan: string
+  initialCeklis: string[]
 }
 
-export default function RmpReviewPanel({ rmpId, currentStatus, initialCatatan }: Props) {
+export default function RmpReviewPanel({
+  rmpId,
+  currentStatus,
+  initialCatatan,
+  initialCeklis,
+}: Props) {
   const router = useRouter()
   const [catatan, setCatatan] = useState(initialCatatan)
+  const [ceklis, setCeklis] = useState<string[]>(initialCeklis)
   const [isPending, startTransition] = useTransition()
   const [pendingDecision, setPendingDecision] = useState<ReviewDecision | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   const isApproved = currentStatus === 'approved'
 
+  function toggleCeklis(id: string) {
+    setCeklis((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]))
+  }
+
   function submit(decision: ReviewDecision) {
     setError(null)
     setPendingDecision(decision)
     startTransition(async () => {
-      const result = await reviewRmp({ id: rmpId, decision, catatan })
+      const result = await reviewRmp({ id: rmpId, decision, catatan, admin_ceklis: ceklis })
       if (result.error) {
         setError(result.error)
         setPendingDecision(null)
@@ -53,6 +65,46 @@ export default function RmpReviewPanel({ rmpId, currentStatus, initialCatatan }:
             </p>
           </div>
         )}
+
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <label className="block font-body text-sm font-semibold text-slate-700">
+              Ceklis Administrasi Modul
+            </label>
+            <span className="font-body text-xs text-slate-400">
+              {ceklis.length}/{ADMIN_CEKLIS_TOTAL}
+            </span>
+          </div>
+          <div className="space-y-1.5">
+            {ADMIN_CEKLIS_ITEMS.map((item) => {
+              const checked = ceklis.includes(item.id)
+              return (
+                <button
+                  type="button"
+                  key={item.id}
+                  onClick={() => toggleCeklis(item.id)}
+                  disabled={isPending}
+                  className={`flex items-start gap-2.5 w-full text-left rounded-lg border px-3 py-2 transition disabled:opacity-50 ${
+                    checked
+                      ? 'border-emerald-300 bg-emerald-50/60'
+                      : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
+                  }`}
+                >
+                  <span
+                    className={`flex items-center justify-center w-[18px] h-[18px] rounded shrink-0 border mt-0.5 transition ${
+                      checked
+                        ? 'bg-emerald-500 border-emerald-500 text-white'
+                        : 'border-slate-300 bg-white text-transparent'
+                    }`}
+                  >
+                    <Check className="w-3 h-3" strokeWidth={3} />
+                  </span>
+                  <span className="font-body text-xs text-slate-700 leading-snug">{item.label}</span>
+                </button>
+              )
+            })}
+          </div>
+        </div>
 
         <div>
           <label

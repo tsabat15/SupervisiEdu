@@ -6,6 +6,21 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
+export interface RtlItem {
+  masalah: string
+  aksi: string
+  target: string
+}
+
+export interface DocItem {
+  url: string
+  name: string
+  type: 'image' | 'video' | 'file'
+}
+
+/** Isi satu formulir SPVC naratif: { fieldKey: isiTeks }. */
+export type SpvcData = Record<string, string>
+
 export type UserRole = 'admin' | 'guru' | 'kepsek'
 export type ScheduleStatus = 'dijadwalkan' | 'selesai' | 'dibatalkan'
 export type ReportStatus = 'draft' | 'submitted' | 'approved'
@@ -66,6 +81,8 @@ export interface Database {
           zoom_link_pra: string | null
           zoom_link_pengamatan: string | null
           zoom_link_pasca: string | null
+          kontrak_fokus: string[] | null
+          kontrak_catatan: string | null
           created_at: string
           updated_at: string
         }
@@ -82,6 +99,8 @@ export interface Database {
           zoom_link_pra?: string | null
           zoom_link_pengamatan?: string | null
           zoom_link_pasca?: string | null
+          kontrak_fokus?: string[] | null
+          kontrak_catatan?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -97,6 +116,8 @@ export interface Database {
           zoom_link_pra?: string | null
           zoom_link_pengamatan?: string | null
           zoom_link_pasca?: string | null
+          kontrak_fokus?: string[] | null
+          kontrak_catatan?: string | null
           updated_at?: string
         }
       }
@@ -109,12 +130,21 @@ export interface Database {
           visit_date: string
           subject: string
           class_name: string
+          jam_ke: string | null
+          materi: string | null
           strengths: string | null
           improvements: string | null
           recommendations: string | null
           score: number | null
           status: ReportStatus
           instrument_type: string
+          observation_scores: Record<string, number> | null
+          rtl_items: RtlItem[] | null
+          documentation_urls: DocItem[] | null
+          spvc04: SpvcData | null
+          spvc05: SpvcData | null
+          spvc06: SpvcData | null
+          spvc09: SpvcData | null
           created_at: string
           updated_at: string
         }
@@ -126,12 +156,21 @@ export interface Database {
           visit_date: string
           subject: string
           class_name: string
+          jam_ke?: string | null
+          materi?: string | null
           strengths?: string | null
           improvements?: string | null
           recommendations?: string | null
           score?: number | null
           status?: ReportStatus
           instrument_type?: string
+          observation_scores?: Record<string, number> | null
+          rtl_items?: RtlItem[] | null
+          documentation_urls?: DocItem[] | null
+          spvc04?: SpvcData | null
+          spvc05?: SpvcData | null
+          spvc06?: SpvcData | null
+          spvc09?: SpvcData | null
           created_at?: string
           updated_at?: string
         }
@@ -142,12 +181,21 @@ export interface Database {
           visit_date?: string
           subject?: string
           class_name?: string
+          jam_ke?: string | null
+          materi?: string | null
           strengths?: string | null
           improvements?: string | null
           recommendations?: string | null
           score?: number | null
           status?: ReportStatus
           instrument_type?: string
+          observation_scores?: Record<string, number> | null
+          rtl_items?: RtlItem[] | null
+          documentation_urls?: DocItem[] | null
+          spvc04?: SpvcData | null
+          spvc05?: SpvcData | null
+          spvc06?: SpvcData | null
+          spvc09?: SpvcData | null
           updated_at?: string
         }
       }
@@ -170,6 +218,7 @@ export interface Database {
           asesmen_sumatif: string
           status: RmpStatus
           catatan_kepsek: string | null
+          admin_ceklis: string[] | null
           reviewed_by: string | null
           reviewed_at: string | null
           created_at: string
@@ -193,6 +242,7 @@ export interface Database {
           asesmen_sumatif?: string
           status?: RmpStatus
           catatan_kepsek?: string | null
+          admin_ceklis?: string[] | null
           reviewed_by?: string | null
           reviewed_at?: string | null
           created_at?: string
@@ -214,6 +264,7 @@ export interface Database {
           asesmen_sumatif?: string
           status?: RmpStatus
           catatan_kepsek?: string | null
+          admin_ceklis?: string[] | null
           reviewed_by?: string | null
           reviewed_at?: string | null
           updated_at?: string

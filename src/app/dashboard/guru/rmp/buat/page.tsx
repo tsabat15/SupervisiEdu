@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState, useTransition } from 'react'
+import { ListChecks } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Check, ChevronLeft, ChevronRight, Loader2, Save, Send } from 'lucide-react'
@@ -8,18 +9,7 @@ import GururSidebar from '@/src/components/dashboard/guru/GururSidebar'
 import { createBrowserClient } from '@/src/utils/supabase/client'
 import { upsertRmp } from '../actions'
 import type { RmpForm, RmpStatus } from '@/src/types/database'
-
-const TEMA_P5 = [
-  'Gaya Hidup Berkelanjutan',
-  'Kearifan Lokal',
-  'Bhinneka Tunggal Ika',
-  'Bangunlah Jiwa dan Raganya',
-  'Suara Demokrasi',
-  'Berekayasa dan Berteknologi untuk Membangun NKRI',
-  'Kewirausahaan',
-] as const
-
-const FASE = ['Fase A', 'Fase B', 'Fase C', 'Fase D', 'Fase E', 'Fase F'] as const
+import { PROFIL_LULUSAN, TEMA_PROJEK, FASE } from '@/src/lib/profil-lulusan'
 
 const STEPS = [
   { id: 1, label: 'Informasi Umum' },
@@ -398,6 +388,84 @@ const inputClass =
 
 const labelClass = 'block font-body text-sm font-semibold text-slate-700 mb-1.5'
 
+/**
+ * Dropdown with a "Ketik sendiri..." escape hatch.
+ * If the loaded value is not in the options list, custom mode activates automatically.
+ */
+function ComboSelect({
+  options,
+  value,
+  onChange,
+  placeholder,
+  ariaLabel,
+  customPlaceholder = 'Ketik nilai kustom...',
+}: {
+  options: readonly string[]
+  value: string
+  onChange: (v: string) => void
+  placeholder: string
+  ariaLabel?: string
+  customPlaceholder?: string
+}) {
+  const isCustomValue = value !== '' && !(options as readonly string[]).includes(value)
+  const [customMode, setCustomMode] = useState(isCustomValue)
+
+  // If a draft was saved with a custom value, activate custom mode on mount
+  useEffect(() => {
+    if (value !== '' && !(options as readonly string[]).includes(value)) {
+      setCustomMode(true)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  if (customMode) {
+    return (
+      <div className="flex gap-2">
+        <input
+          type="text"
+          aria-label={ariaLabel}
+          value={value}
+          autoFocus
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={customPlaceholder}
+          className={inputClass}
+        />
+        <button
+          type="button"
+          onClick={() => { setCustomMode(false); onChange('') }}
+          title="Kembali ke daftar pilihan"
+          className="shrink-0 inline-flex items-center gap-1 px-3 rounded-lg border border-slate-300 font-body text-xs font-medium text-slate-500 hover:bg-slate-100 transition whitespace-nowrap"
+        >
+          <ListChecks className="w-3.5 h-3.5" />
+          Pilih
+        </button>
+      </div>
+    )
+  }
+
+  return (
+    <select
+      aria-label={ariaLabel}
+      value={value}
+      onChange={(e) => {
+        if (e.target.value === '__custom__') {
+          setCustomMode(true)
+          onChange('')
+        } else {
+          onChange(e.target.value)
+        }
+      }}
+      className={inputClass}
+    >
+      <option value="">{placeholder}</option>
+      {(options as readonly string[]).map((opt) => (
+        <option key={opt} value={opt}>{opt}</option>
+      ))}
+      <option value="__custom__">✏ Ketik sendiri...</option>
+    </select>
+  )
+}
+
 function Step1({
   judul,
   tema,
@@ -425,36 +493,26 @@ function Step1({
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className={labelClass}>Tema P5</label>
-          <select
-            aria-label="Tema P5"
+          <label className={labelClass}>Tema Projek</label>
+          <ComboSelect
+            options={TEMA_PROJEK}
             value={tema}
-            onChange={(e) => onChange({ tema: e.target.value })}
-            className={inputClass}
-          >
-            <option value="">Pilih tema...</option>
-            {TEMA_P5.map((t) => (
-              <option key={t} value={t}>
-                {t}
-              </option>
-            ))}
-          </select>
+            onChange={(v) => onChange({ tema: v })}
+            placeholder="Pilih tema..."
+            ariaLabel="Tema Projek"
+            customPlaceholder="Ketik tema projek kustom..."
+          />
         </div>
         <div>
           <label className={labelClass}>Fase</label>
-          <select
-            aria-label="Fase"
+          <ComboSelect
+            options={FASE}
             value={fase}
-            onChange={(e) => onChange({ fase: e.target.value })}
-            className={inputClass}
-          >
-            <option value="">Pilih fase...</option>
-            {FASE.map((f) => (
-              <option key={f} value={f}>
-                {f}
-              </option>
-            ))}
-          </select>
+            onChange={(v) => onChange({ fase: v })}
+            placeholder="Pilih fase..."
+            ariaLabel="Fase"
+            customPlaceholder="Ketik fase kustom..."
+          />
         </div>
       </div>
       <div>
@@ -484,30 +542,82 @@ function Step2({
   elemen: string
   onChange: (patch: Partial<RmpState>) => void
 }) {
+  const selected = new Set(splitLines(dimensi))
+
+  function toggle(label: string) {
+    const next = new Set(selected)
+    if (next.has(label)) {
+      next.delete(label)
+    } else {
+      next.add(label)
+    }
+    // Pertahankan urutan sesuai daftar PROFIL_LULUSAN
+    const ordered = PROFIL_LULUSAN.filter((p) => next.has(p.label)).map((p) => p.label)
+    onChange({ dimensi_p5_text: ordered.join('\n') })
+  }
+
   return (
     <>
       <div>
-        <label className={labelClass}>Dimensi Profil Pelajar Pancasila</label>
-        <textarea
-          value={dimensi}
-          onChange={(e) => onChange({ dimensi_p5_text: e.target.value })}
-          placeholder={'Satu dimensi per baris. Contoh:\nBeriman dan Bertakwa\nBernalar Kritis\nGotong Royong'}
-          className={textareaClass}
-        />
-        <p className="mt-1.5 font-body text-xs text-slate-400">
-          Tulis satu dimensi per baris.
+        <label className={labelClass}>Dimensi Profil Lulusan yang Disasar</label>
+        <p className="mb-3 font-body text-xs text-slate-400">
+          Pilih dimensi yang menjadi target utama projek. Disarankan maksimal 2–3 dimensi agar fokus.
         </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          {PROFIL_LULUSAN.map((p) => {
+            const isChecked = selected.has(p.label)
+            return (
+              <button
+                type="button"
+                key={p.id}
+                onClick={() => toggle(p.label)}
+                className={`flex items-start gap-3 text-left rounded-lg border px-3.5 py-3 transition ${
+                  isChecked
+                    ? 'border-[#D4AF37] bg-[#D4AF37]/10 ring-1 ring-[#D4AF37]/40'
+                    : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
+                }`}
+              >
+                <span
+                  className={`mt-0.5 flex items-center justify-center w-5 h-5 rounded shrink-0 border transition ${
+                    isChecked
+                      ? 'bg-[#D4AF37] border-[#D4AF37] text-[#002147]'
+                      : 'border-slate-300 bg-white text-transparent'
+                  }`}
+                >
+                  <Check className="w-3.5 h-3.5" strokeWidth={3} />
+                </span>
+                <span className="min-w-0">
+                  <span className="block font-body text-sm font-semibold text-slate-800 leading-snug">
+                    {p.label}
+                  </span>
+                  <span className="block font-body text-xs text-slate-500 mt-0.5 leading-snug">
+                    {p.deskripsi}
+                  </span>
+                </span>
+              </button>
+            )
+          })}
+        </div>
+        {selected.size > 0 && (
+          <p className="mt-2.5 font-body text-xs text-slate-500">
+            {selected.size} dimensi dipilih.
+          </p>
+        )}
       </div>
+
       <div>
-        <label className={labelClass}>Elemen yang Disasar</label>
+        <label className={labelClass}>
+          Elemen / Fokus yang Disasar{' '}
+          <span className="font-normal text-slate-400">(opsional)</span>
+        </label>
         <textarea
           value={elemen}
           onChange={(e) => onChange({ elemen_p5_text: e.target.value })}
-          placeholder={'Satu elemen per baris. Contoh:\nAkhlak kepada alam\nMemperoleh dan memproses informasi\nKolaborasi'}
+          placeholder={'Rincian sub-fokus per dimensi, satu per baris. Contoh:\nBernalar kritis: memproses informasi\nKolaborasi: kerja sama tim'}
           className={textareaClass}
         />
         <p className="mt-1.5 font-body text-xs text-slate-400">
-          Tulis satu elemen per baris.
+          Tulis satu elemen per baris (boleh dikosongkan).
         </p>
       </div>
     </>
@@ -665,15 +775,15 @@ function Step5Preview({
       <PreviewSection title="Informasi Umum" stepId={1} onJumpTo={onJumpTo}>
         <PreviewField label="Judul Projek" value={state.judul} />
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <PreviewField label="Tema P5" value={state.tema} />
+          <PreviewField label="Tema Projek" value={state.tema} />
           <PreviewField label="Fase" value={state.fase} />
         </div>
         <PreviewField label="Kelas" value={state.kelas} />
       </PreviewSection>
 
       <PreviewSection title="Tujuan Projek" stepId={2} onJumpTo={onJumpTo}>
-        <PreviewList label="Dimensi Profil Pelajar Pancasila" items={dimensi} />
-        <PreviewList label="Elemen yang Disasar" items={elemen} />
+        <PreviewList label="Dimensi Profil Lulusan" items={dimensi} />
+        <PreviewList label="Elemen / Fokus yang Disasar" items={elemen} />
       </PreviewSection>
 
       <PreviewSection title="Alur Aktivitas" stepId={3} onJumpTo={onJumpTo}>

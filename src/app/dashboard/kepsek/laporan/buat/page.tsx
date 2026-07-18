@@ -39,8 +39,9 @@ export default async function KepsekLaporanBuatPage() {
     redirect('/dashboard')
   }
 
-  const [{ data: gurus }, { data: jadwalSelesai }] = (await Promise.all([
-    supabase.from('profiles').select('id, full_name').eq('role', 'guru').order('full_name'),
+  const [{ data: supervisorProfile }, { data: gurus }, { data: jadwalSelesai }] = (await Promise.all([
+    supabase.from('profiles').select('full_name').eq('id', user.id).single(),
+    supabase.from('profiles').select('id, full_name, nip').eq('role', 'guru').order('full_name'),
     supabase
       .from('schedules')
       .select('id, subject, class_name, scheduled_date')
@@ -48,15 +49,17 @@ export default async function KepsekLaporanBuatPage() {
       .eq('status', 'selesai')
       .order('scheduled_date', { ascending: false }),
   ])) as unknown as [
-    { data: { id: string; full_name: string }[] | null },
+    { data: { full_name: string } | null },
+    { data: { id: string; full_name: string; nip: string | null }[] | null },
     { data: Pick<Schedule, 'id' | 'subject' | 'class_name' | 'scheduled_date'>[] | null },
   ]
 
-  const guruOptions = (gurus ?? []).map((g) => ({ id: g.id, full_name: g.full_name }))
+  const guruOptions = (gurus ?? []).map((g) => ({ id: g.id, full_name: g.full_name, nip: g.nip }))
   const jadwalOptions = (jadwalSelesai ?? []).map((j) => ({
     id: j.id,
     label: formatJadwalLabel(j),
   }))
+  const supervisorName = supervisorProfile?.full_name ?? ''
 
   return (
     <div className="flex h-screen">
@@ -87,6 +90,7 @@ export default async function KepsekLaporanBuatPage() {
               mode="create"
               guruOptions={guruOptions}
               jadwalOptions={jadwalOptions}
+              supervisorName={supervisorName}
             />
           </div>
         </main>

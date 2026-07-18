@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
-import { AlertTriangle, ArrowLeft, CheckCircle2, Clock, Edit } from 'lucide-react'
+import { AlertTriangle, ArrowLeft, Check, CheckCircle2, Clock, Edit, Minus } from 'lucide-react'
+import { ADMIN_CEKLIS_ITEMS } from '@/src/lib/rmp-ceklis'
 import { createServerClient } from '@/src/utils/supabase/server'
 import GururSidebar from '@/src/components/dashboard/guru/GururSidebar'
 import RmpRealtimeWatcher from '@/src/components/dashboard/guru/RmpRealtimeWatcher'
@@ -160,7 +161,7 @@ export default async function GuruRmpDetailPage({
           <Section title="Informasi Umum">
             <Field label="Judul Projek" value={rmp.judul} />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <Field label="Tema P5" value={rmp.tema} />
+              <Field label="Tema Projek" value={rmp.tema} />
               <Field label="Fase" value={rmp.fase} />
             </div>
             <Field label="Kelas" value={rmp.kelas} />
@@ -168,10 +169,10 @@ export default async function GuruRmpDetailPage({
 
           <Section title="Tujuan Projek">
             <ListField
-              label="Dimensi Profil Pelajar Pancasila"
+              label="Dimensi Profil Lulusan"
               items={rmp.dimensi_p5 ?? []}
             />
-            <ListField label="Elemen yang Disasar" items={rmp.elemen_p5 ?? []} />
+            <ListField label="Elemen / Fokus yang Disasar" items={rmp.elemen_p5 ?? []} />
           </Section>
 
           <Section title="Alur Aktivitas">
@@ -188,6 +189,8 @@ export default async function GuruRmpDetailPage({
             <Field label="Asesmen Formatif" value={rmp.asesmen_formatif} />
             <Field label="Asesmen Sumatif" value={rmp.asesmen_sumatif} />
           </Section>
+
+          <CeklisAdminCard ceklis={rmp.admin_ceklis} reviewed={Boolean(rmp.reviewed_at)} />
 
           <div className="font-body text-xs text-slate-400 text-center pt-2">
             Dibuat {formatDateTime(rmp.created_at)} · Diperbarui{' '}
@@ -244,6 +247,55 @@ function Field({ label, value }: { label: string; value: string | null }) {
         {text || 'Belum diisi'}
       </p>
     </div>
+  )
+}
+
+function CeklisAdminCard({
+  ceklis,
+  reviewed,
+}: {
+  ceklis: string[] | null
+  reviewed: boolean
+}) {
+  // Hanya tampilkan setelah RMP ditinjau kepala sekolah
+  if (!reviewed) return null
+  const checked = new Set(Array.isArray(ceklis) ? ceklis : [])
+
+  return (
+    <section className="bg-white rounded-xl border border-slate-200">
+      <div className="px-5 md:px-6 py-3.5 border-b border-slate-100">
+        <h3 className="font-heading text-base font-bold text-[#002147]">
+          Verifikasi Administrasi Modul
+        </h3>
+        <p className="font-body text-xs text-slate-500 mt-0.5">
+          Hasil pemeriksaan kelengkapan oleh kepala sekolah ({checked.size}/
+          {ADMIN_CEKLIS_ITEMS.length}).
+        </p>
+      </div>
+      <div className="px-5 md:px-6 py-4 md:py-5 space-y-2">
+        {ADMIN_CEKLIS_ITEMS.map((item) => {
+          const ok = checked.has(item.id)
+          return (
+            <div key={item.id} className="flex items-start gap-2.5">
+              <span
+                className={`flex items-center justify-center w-[18px] h-[18px] rounded-full shrink-0 mt-0.5 ${
+                  ok ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-300'
+                }`}
+              >
+                {ok ? <Check className="w-3 h-3" strokeWidth={3} /> : <Minus className="w-3 h-3" />}
+              </span>
+              <span
+                className={`font-body text-sm leading-snug ${
+                  ok ? 'text-slate-700' : 'text-slate-400'
+                }`}
+              >
+                {item.label}
+              </span>
+            </div>
+          )
+        })}
+      </div>
+    </section>
   )
 }
 

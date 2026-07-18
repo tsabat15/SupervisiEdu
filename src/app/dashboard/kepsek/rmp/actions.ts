@@ -10,6 +10,7 @@ export async function reviewRmp(params: {
   id: string
   decision: ReviewDecision
   catatan: string
+  admin_ceklis?: string[]
 }): Promise<{ error?: string }> {
   const supabase = await createServerClient()
 
@@ -35,12 +36,17 @@ export async function reviewRmp(params: {
     return { error: 'Catatan wajib diisi saat mengembalikan untuk revisi.' }
   }
 
+  const adminCeklis = Array.isArray(params.admin_ceklis)
+    ? params.admin_ceklis.map((s) => s.trim()).filter(Boolean)
+    : []
+
   const now = new Date().toISOString()
   const { error } = await supabase
     .from('rmp_forms')
     .update({
       status: params.decision,
       catatan_kepsek: catatan || null,
+      admin_ceklis: adminCeklis.length > 0 ? adminCeklis : null,
       reviewed_by: user.id,
       reviewed_at: now,
       updated_at: now,

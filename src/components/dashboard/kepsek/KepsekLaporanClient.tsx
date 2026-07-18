@@ -13,8 +13,8 @@ const INSTRUMENT_SHORT: Record<string, string> = {
 
 function getPredikat(score: number): string {
   if (score >= 91) return 'SB'
-  if (score >= 81) return 'B'
-  if (score >= 71) return 'C'
+  if (score >= 76) return 'B'
+  if (score >= 61) return 'C'
   return 'K'
 }
 

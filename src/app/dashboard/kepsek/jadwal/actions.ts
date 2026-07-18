@@ -16,6 +16,14 @@ export interface SchedulePayload {
   zoom_link_pra?: string | null
   zoom_link_pengamatan?: string | null
   zoom_link_pasca?: string | null
+  kontrak_fokus?: string[] | null
+  kontrak_catatan?: string | null
+}
+
+function sanitizeKontrakFokus(items: string[] | null | undefined): string[] | null {
+  if (!Array.isArray(items)) return null
+  const cleaned = items.map((s) => s.trim()).filter(Boolean)
+  return cleaned.length > 0 ? cleaned : null
 }
 
 async function requireKepsek(): Promise<{ userId?: string; error?: string }> {
@@ -93,6 +101,8 @@ export async function createSchedule(
     zoom_link_pra: validateHttpUrl(payload.zoom_link_pra?.trim()),
     zoom_link_pengamatan: validateHttpUrl(payload.zoom_link_pengamatan?.trim()),
     zoom_link_pasca: validateHttpUrl(payload.zoom_link_pasca?.trim()),
+    kontrak_fokus: sanitizeKontrakFokus(payload.kontrak_fokus),
+    kontrak_catatan: payload.kontrak_catatan?.trim() || null,
     status: 'dijadwalkan' satisfies ScheduleStatus,
   }
   const { data, error } = (await supabase
@@ -127,7 +137,9 @@ export async function updateSchedule(
 
   const { data: existing } = (await supabase
     .from('schedules')
-    .select('teacher_id, scheduled_date, scheduled_time, subject, class_name, status')
+    .select(
+      'teacher_id, scheduled_date, scheduled_time, subject, class_name, status, kontrak_fokus',
+    )
     .eq('id', payload.id)
     .single()) as unknown as {
     data: {
@@ -137,6 +149,7 @@ export async function updateSchedule(
       subject: string
       class_name: string
       status: ScheduleStatus
+      kontrak_fokus: string[] | null
     } | null
   }
 
@@ -144,6 +157,8 @@ export async function updateSchedule(
   if (existing.status !== 'dijadwalkan') {
     return { error: 'Hanya jadwal berstatus dijadwalkan yang dapat diubah.' }
   }
+
+  const kontrakFokus = sanitizeKontrakFokus(payload.kontrak_fokus)
 
   const updates = {
     teacher_id: payload.teacher_id,
@@ -155,6 +170,8 @@ export async function updateSchedule(
     zoom_link_pra: validateHttpUrl(payload.zoom_link_pra?.trim()),
     zoom_link_pengamatan: validateHttpUrl(payload.zoom_link_pengamatan?.trim()),
     zoom_link_pasca: validateHttpUrl(payload.zoom_link_pasca?.trim()),
+    kontrak_fokus: kontrakFokus,
+    kontrak_catatan: payload.kontrak_catatan?.trim() || null,
     updated_at: new Date().toISOString(),
   }
 
@@ -182,6 +199,18 @@ export async function updateSchedule(
       teacherId: payload.teacher_id,
       title: 'Jadwal supervisi diperbarui',
       message: `Supervisi ${updates.subject} (${updates.class_name}) kini ${formatDate(updates.scheduled_date)} ${updates.scheduled_time.slice(0, 5)}.`,
+    })
+  }
+
+  // Notifikasi kontrak pra-konferensi bila fokus baru ditetapkan / diubah
+  const fokusChanged =
+    kontrakFokus !== null &&
+    JSON.stringify(kontrakFokus) !== JSON.stringify(existing.kontrak_fokus ?? null)
+  if (fokusChanged) {
+    await notifyGuru({
+      teacherId: payload.teacher_id,
+      title: 'Kontrak pra-konferensi ditetapkan',
+      message: `Fokus observasi untuk supervisi ${updates.subject} (${updates.class_name}) telah disepakati. Silakan tinjau di jadwal Anda.`,
     })
   }
 

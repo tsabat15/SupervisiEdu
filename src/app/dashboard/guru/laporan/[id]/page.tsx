@@ -1,7 +1,25 @@
 import { notFound, redirect } from 'next/navigation'
 import { createServerClient } from '@/src/utils/supabase/server'
 import GururSidebar from '@/src/components/dashboard/guru/GururSidebar'
-import type { SupervisionReport } from '@/src/types/database'
+import LaporanRadarChart from '@/src/components/dashboard/kepsek/LaporanRadarChart'
+import LaporanDokumentasi from '@/src/components/dashboard/kepsek/LaporanDokumentasi'
+import SpvcNarrativeForm from '@/src/components/dashboard/kepsek/SpvcNarrativeForm'
+import LaporanRtlForm from '@/src/components/dashboard/kepsek/LaporanRtlForm'
+import { SPVC_FORMS, type SpvcColumn } from '@/src/lib/spvc-forms'
+import type { SupervisionReport, SpvcData } from '@/src/types/database'
+
+/** Isi formulir SPVC; SPVC-05 jatuh balik ke catatan lama bila belum diisi ulang. */
+function spvcInitial(laporan: SupervisionReport, column: SpvcColumn): SpvcData | null {
+  const current = laporan[column]
+  if (current && Object.keys(current).length > 0) return current
+
+  if (column === 'spvc05') {
+    const kekuatan = (laporan.strengths ?? '').trim()
+    const kelemahan = (laporan.improvements ?? '').trim()
+    if (kekuatan || kelemahan) return { kekuatan, kelemahan }
+  }
+  return null
+}
 
 export const dynamic = 'force-dynamic'
 
@@ -16,8 +34,8 @@ function formatDate(value: string) {
 
 function getPredikat(score: number): { label: string; singkat: string; cls: string } {
   if (score >= 91) return { label: 'Sangat Baik', singkat: 'SB', cls: 'bg-emerald-50 text-emerald-700 border-emerald-200' }
-  if (score >= 81) return { label: 'Baik', singkat: 'B', cls: 'bg-blue-50 text-blue-700 border-blue-200' }
-  if (score >= 71) return { label: 'Cukup', singkat: 'C', cls: 'bg-amber-50 text-amber-700 border-amber-200' }
+  if (score >= 76) return { label: 'Baik', singkat: 'B', cls: 'bg-blue-50 text-blue-700 border-blue-200' }
+  if (score >= 61) return { label: 'Cukup', singkat: 'C', cls: 'bg-amber-50 text-amber-700 border-amber-200' }
   return { label: 'Kurang', singkat: 'K', cls: 'bg-red-50 text-red-700 border-red-200' }
 }
 
@@ -39,23 +57,6 @@ function ScoreDisplay({ score }: { score: number | null }) {
   )
 }
 
-function SectionBlock({
-  title,
-  content,
-}: {
-  title: string
-  content: string | null
-}) {
-  if (!content) return null
-  return (
-    <div className="bg-white rounded-xl border border-slate-200 shadow-sm px-5 md:px-6 py-5">
-      <h2 className="font-heading text-sm font-bold text-[#002147] mb-3">{title}</h2>
-      <p className="font-body text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">
-        {content}
-      </p>
-    </div>
-  )
-}
 
 export default async function GuruLaporanDetailPage({
   params,
@@ -109,7 +110,11 @@ export default async function GuruLaporanDetailPage({
           </p>
           <p className="font-body text-xs text-slate-400 mt-0.5">
             {INSTRUMENT_LABEL[laporan.instrument_type] ?? 'Penilaian Pelaksanaan Pembelajaran'}
+            {laporan.jam_ke ? ` · Jam ke-${laporan.jam_ke}` : ''}
           </p>
+          {laporan.materi && (
+            <p className="font-body text-xs text-slate-400 mt-0.5">Materi: {laporan.materi}</p>
+          )}
         </header>
 
         <main className="px-4 py-6 md:px-8 md:py-8 max-w-3xl mx-auto w-full space-y-4">
@@ -124,7 +129,7 @@ export default async function GuruLaporanDetailPage({
                     <span className="text-slate-400">({getPredikat(laporan.score).singkat})</span>
                   </p>
                   <p className="font-body text-xs text-slate-400 mt-0.5">
-                    Skala: SB ≥91 · B ≥81 · C ≥71 · K &lt;71
+                    SB ≥91 · B ≥76 · C ≥61 · K &lt;61
                   </p>
                 </>
               ) : (
@@ -133,9 +138,42 @@ export default async function GuruLaporanDetailPage({
             </div>
           </div>
 
-          <SectionBlock title="Kekuatan yang Diamati" content={laporan.strengths} />
-          <SectionBlock title="Area yang Perlu Ditingkatkan" content={laporan.improvements} />
-          <SectionBlock title="Rekomendasi" content={laporan.recommendations} />
+          {laporan.instrument_type === 'pelaksanaan' && (
+            <LaporanRadarChart observationScores={laporan.observation_scores} />
+          )}
+
+          {/* Urutan sesuai buku: 04 → 05 → 06 → 07/08 (RTL) → 09 */}
+          {SPVC_FORMS.filter((d) => d.column !== 'spvc09').map((def) => (
+            <SpvcNarrativeForm
+              key={def.column}
+              reportId={laporan.id}
+              def={def}
+              initialData={spvcInitial(laporan, def.column)}
+              readOnly
+            />
+          ))}
+
+          <LaporanRtlForm
+            reportId={laporan.id}
+            initialItems={laporan.rtl_items}
+            legacyRecommendation={laporan.recommendations}
+            readOnly
+          />
+
+          {SPVC_FORMS.filter((d) => d.column === 'spvc09').map((def) => (
+            <SpvcNarrativeForm
+              key={def.column}
+              reportId={laporan.id}
+              def={def}
+              initialData={spvcInitial(laporan, def.column)}
+              readOnly
+            />
+          ))}
+          <LaporanDokumentasi
+            reportId={laporan.id}
+            initialDocs={laporan.documentation_urls}
+            readOnly
+          />
         </main>
       </div>
     </div>

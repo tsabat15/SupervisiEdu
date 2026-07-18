@@ -3,21 +3,34 @@
 import { revalidatePath } from 'next/cache'
 import { createServerClient } from '@/src/utils/supabase/server'
 import { createAdminClient } from '@/src/utils/supabase/admin'
-import type { ReportStatus } from '@/src/types/database'
+import type { ReportStatus, RtlItem, DocItem, SpvcData } from '@/src/types/database'
+import { isSpvcColumn, getSpvcForm, type SpvcColumn } from '@/src/lib/spvc-forms'
 
 export type InstrumentType = 'administrasi' | 'modul_ajar' | 'pelaksanaan'
+
+function sanitizeRtl(items: RtlItem[] | null | undefined): RtlItem[] | null {
+  if (!items || !Array.isArray(items)) return null
+  const cleaned = items
+    .map((it) => ({
+      masalah: (it.masalah ?? '').trim(),
+      aksi: (it.aksi ?? '').trim(),
+      target: (it.target ?? '').trim(),
+    }))
+    .filter((it) => it.masalah || it.aksi || it.target)
+  return cleaned.length > 0 ? cleaned : null
+}
 
 export interface LaporanPayload {
   teacher_id: string
   visit_date: string
   subject: string
   class_name: string
-  strengths?: string | null
-  improvements?: string | null
-  recommendations?: string | null
+  jam_ke?: string | null
+  materi?: string | null
   score?: number | null
   schedule_id?: string | null
   instrument_type?: InstrumentType
+  observation_scores?: Record<string, number> | null
 }
 
 async function requireKepsek(): Promise<{ userId?: string; error?: string }> {
@@ -77,12 +90,12 @@ export async function createLaporan(
     visit_date: payload.visit_date,
     subject: payload.subject.trim(),
     class_name: payload.class_name.trim(),
-    strengths: payload.strengths?.trim() || null,
-    improvements: payload.improvements?.trim() || null,
-    recommendations: payload.recommendations?.trim() || null,
+    jam_ke: payload.jam_ke?.trim() || null,
+    materi: payload.materi?.trim() || null,
     score: payload.score ?? null,
     schedule_id: payload.schedule_id || null,
     instrument_type: payload.instrument_type ?? 'pelaksanaan',
+    observation_scores: payload.observation_scores ?? null,
     status: 'draft' satisfies ReportStatus,
   }
 
@@ -130,12 +143,12 @@ export async function updateLaporan(
     visit_date: payload.visit_date,
     subject: payload.subject.trim(),
     class_name: payload.class_name.trim(),
-    strengths: payload.strengths?.trim() || null,
-    improvements: payload.improvements?.trim() || null,
-    recommendations: payload.recommendations?.trim() || null,
+    jam_ke: payload.jam_ke?.trim() || null,
+    materi: payload.materi?.trim() || null,
     score: payload.score ?? null,
     schedule_id: payload.schedule_id || null,
     instrument_type: payload.instrument_type ?? 'pelaksanaan',
+    observation_scores: payload.observation_scores ?? null,
     updated_at: new Date().toISOString(),
   }
 
@@ -255,5 +268,150 @@ export async function deleteLaporan(id: string): Promise<{ error?: string }> {
   if (error) return { error: error.message }
 
   revalidatePath('/dashboard/kepsek/laporan')
+  return {}
+}
+
+const MAX_DOCS = 12
+
+function sanitizeDocs(items: DocItem[] | null | undefined): DocItem[] {
+  if (!Array.isArray(items)) return []
+  return items
+    .filter(
+      (it): it is DocItem =>
+        !!it &&
+        typeof it.url === 'string' &&
+        /^https?:\/\//.test(it.url) &&
+        (it.type === 'image' || it.type === 'video' || it.type === 'file'),
+    )
+    .map((it) => ({
+      url: it.url,
+      name: (it.name ?? '').slice(0, 200),
+      type: it.type,
+    }))
+    .slice(0, MAX_DOCS)
+}
+
+/** Menyimpan formulir RTL (SPVC-07/08) secara mandiri. */
+export async function updateLaporanRtl(
+  reportId: string,
+  items: RtlItem[],
+): Promise<{ error?: string }> {
+  const { userId, error: authErr } = await requireKepsek()
+  if (authErr || !userId) return { error: authErr ?? 'Tidak terautentikasi.' }
+
+  const supabase = await createServerClient()
+
+  const { data: existing } = (await supabase
+    .from('supervision_reports')
+    .select('supervisor_id')
+    .eq('id', reportId)
+    .single()) as unknown as { data: { supervisor_id: string } | null }
+
+  if (!existing) return { error: 'Laporan tidak ditemukan.' }
+  if (existing.supervisor_id !== userId) {
+    return { error: 'Anda tidak memiliki akses ke laporan ini.' }
+  }
+
+  const { error } = await supabase
+    .from('supervision_reports')
+    .update({
+      rtl_items: sanitizeRtl(items),
+      updated_at: new Date().toISOString(),
+    } as never)
+    .eq('id', reportId)
+
+  if (error) return { error: error.message }
+
+  revalidatePath(`/dashboard/kepsek/laporan/${reportId}`)
+  revalidatePath(`/dashboard/guru/laporan/${reportId}`)
+  return {}
+}
+
+/**
+ * Menyimpan satu formulir SPVC naratif (SPVC-04/05/06/09).
+ * Nama kolom divalidasi terhadap whitelist, dan hanya field yang
+ * terdefinisi pada formulir tersebut yang disimpan.
+ */
+export async function updateSpvcForm(
+  reportId: string,
+  column: string,
+  data: SpvcData,
+): Promise<{ error?: string }> {
+  const { userId, error: authErr } = await requireKepsek()
+  if (authErr || !userId) return { error: authErr ?? 'Tidak terautentikasi.' }
+
+  if (!isSpvcColumn(column)) return { error: 'Formulir tidak dikenali.' }
+  const def = getSpvcForm(column as SpvcColumn)
+  if (!def) return { error: 'Formulir tidak dikenali.' }
+
+  const supabase = await createServerClient()
+
+  const { data: existing } = (await supabase
+    .from('supervision_reports')
+    .select('supervisor_id')
+    .eq('id', reportId)
+    .single()) as unknown as { data: { supervisor_id: string } | null }
+
+  if (!existing) return { error: 'Laporan tidak ditemukan.' }
+  if (existing.supervisor_id !== userId) {
+    return { error: 'Anda tidak memiliki akses ke laporan ini.' }
+  }
+
+  // Hanya terima field yang terdaftar pada definisi formulir
+  const cleaned: SpvcData = {}
+  for (const field of def.fields) {
+    const value = (data?.[field.key] ?? '').trim()
+    if (value) cleaned[field.key] = value
+  }
+
+  const { error } = await supabase
+    .from('supervision_reports')
+    .update({
+      [column]: Object.keys(cleaned).length > 0 ? cleaned : null,
+      updated_at: new Date().toISOString(),
+    } as never)
+    .eq('id', reportId)
+
+  if (error) return { error: error.message }
+
+  revalidatePath(`/dashboard/kepsek/laporan/${reportId}`)
+  revalidatePath(`/dashboard/guru/laporan/${reportId}`)
+  return {}
+}
+
+export async function updateLaporanDokumentasi(
+  reportId: string,
+  docs: DocItem[],
+): Promise<{ error?: string }> {
+  const { userId, error: authErr } = await requireKepsek()
+  if (authErr || !userId) return { error: authErr ?? 'Tidak terautentikasi.' }
+
+  const supabase = await createServerClient()
+
+  const { data: existing } = (await supabase
+    .from('supervision_reports')
+    .select('supervisor_id')
+    .eq('id', reportId)
+    .single()) as unknown as { data: { supervisor_id: string } | null }
+
+  if (!existing) return { error: 'Laporan tidak ditemukan.' }
+  if (existing.supervisor_id !== userId) {
+    return { error: 'Anda tidak memiliki akses ke laporan ini.' }
+  }
+
+  const cleaned = sanitizeDocs(docs)
+
+  const { error } = await supabase
+    .from('supervision_reports')
+    .update({
+      documentation_urls: cleaned.length > 0 ? cleaned : null,
+      updated_at: new Date().toISOString(),
+    } as never)
+    .eq('id', reportId)
+
+  if (error) return { error: error.message }
+
+  revalidatePath(`/dashboard/kepsek/laporan/${reportId}`)
+  revalidatePath(`/dashboard/guru/laporan/${reportId}`)
   return {}
 }

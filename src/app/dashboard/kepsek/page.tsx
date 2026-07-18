@@ -190,19 +190,19 @@ export default async function KepsekDashboardPage() {
     {
       name: 'B',
       label: 'Baik',
-      value: scored.filter((r) => r.score >= 81 && r.score < 91).length,
+      value: scored.filter((r) => r.score >= 76 && r.score < 91).length,
       color: '#3b82f6',
     },
     {
       name: 'C',
       label: 'Cukup',
-      value: scored.filter((r) => r.score >= 71 && r.score < 81).length,
+      value: scored.filter((r) => r.score >= 61 && r.score < 76).length,
       color: '#f59e0b',
     },
     {
       name: 'K',
       label: 'Kurang',
-      value: scored.filter((r) => r.score < 71).length,
+      value: scored.filter((r) => r.score < 61).length,
       color: '#ef4444',
     },
   ]

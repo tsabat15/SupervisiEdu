@@ -261,7 +261,7 @@ const RmpDocument = forwardRef<HTMLDivElement, { data: RmpDocumentData }>(functi
       <div style={styles.dividerThick} />
       <div style={styles.dividerThin} />
 
-      <p style={styles.title}>Rencana Modul Projek Profil Pelajar Pancasila</p>
+      <p style={styles.title}>Rencana Modul Projek Kokurikuler</p>
 
       <table style={styles.contentTable}>
         <tbody>
@@ -288,7 +288,7 @@ const RmpDocument = forwardRef<HTMLDivElement, { data: RmpDocumentData }>(functi
       <table style={styles.contentTable}>
         <tbody>
           <tr>
-            <td style={styles.tdLabel}>Dimensi P5</td>
+            <td style={styles.tdLabel}>Dimensi Profil Lulusan</td>
             <td style={styles.tdValue}>
               {dimensi.length > 0
                 ? dimensi.map((d, i) => (
@@ -300,7 +300,7 @@ const RmpDocument = forwardRef<HTMLDivElement, { data: RmpDocumentData }>(functi
             </td>
           </tr>
           <tr>
-            <td style={styles.tdLabel}>Elemen yang Disasar</td>
+            <td style={styles.tdLabel}>Elemen / Fokus yang Disasar</td>
             <td style={styles.tdValue}>
               {elemen.length > 0
                 ? elemen.map((e, i) => (

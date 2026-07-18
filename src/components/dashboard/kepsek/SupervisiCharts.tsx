@@ -33,8 +33,8 @@ interface Props {
 function getPredikat(avg: number): { name: string; label: string; color: string } | null {
   if (avg <= 0) return null
   if (avg >= 91) return { name: 'SB', label: 'Sangat Baik', color: '#10b981' }
-  if (avg >= 81) return { name: 'B', label: 'Baik', color: '#3b82f6' }
-  if (avg >= 71) return { name: 'C', label: 'Cukup', color: '#f59e0b' }
+  if (avg >= 76) return { name: 'B', label: 'Baik', color: '#3b82f6' }
+  if (avg >= 61) return { name: 'C', label: 'Cukup', color: '#f59e0b' }
   return { name: 'K', label: 'Kurang', color: '#ef4444' }
 }
 

@@ -104,7 +104,7 @@ export default async function KepsekRmpDetailPage({
               <Section title="Informasi Umum">
                 <Field label="Judul Projek" value={rmp.judul} />
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <Field label="Tema P5" value={rmp.tema} />
+                  <Field label="Tema Projek" value={rmp.tema} />
                   <Field label="Fase" value={rmp.fase} />
                 </div>
                 <Field label="Kelas" value={rmp.kelas} />
@@ -112,10 +112,10 @@ export default async function KepsekRmpDetailPage({
 
               <Section title="Tujuan Projek">
                 <ListField
-                  label="Dimensi Profil Pelajar Pancasila"
+                  label="Dimensi Profil Lulusan"
                   items={rmp.dimensi_p5 ?? []}
                 />
-                <ListField label="Elemen yang Disasar" items={rmp.elemen_p5 ?? []} />
+                <ListField label="Elemen / Fokus yang Disasar" items={rmp.elemen_p5 ?? []} />
               </Section>
 
               <Section title="Alur Aktivitas">
@@ -156,6 +156,7 @@ export default async function KepsekRmpDetailPage({
                     rmpId={rmp.id}
                     currentStatus={rmp.status as 'submitted' | 'revision' | 'approved'}
                     initialCatatan={rmp.catatan_kepsek ?? ''}
+                    initialCeklis={rmp.admin_ceklis ?? []}
                   />
                 ) : (
                   <div className="bg-white rounded-xl border border-slate-200 px-5 py-5">

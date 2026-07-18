@@ -8,8 +8,8 @@ export const dynamic = 'force-dynamic'
 function getPredikat(score: number | null): { label: string; className: string } {
   if (!score || score <= 0) return { label: '—', className: 'text-slate-400' }
   if (score >= 91) return { label: 'SB', className: 'text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full font-semibold' }
-  if (score >= 81) return { label: 'B', className: 'text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full font-semibold' }
-  if (score >= 71) return { label: 'C', className: 'text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full font-semibold' }
+  if (score >= 76) return { label: 'B', className: 'text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full font-semibold' }
+  if (score >= 61) return { label: 'C', className: 'text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full font-semibold' }
   return { label: 'K', className: 'text-red-700 bg-red-50 px-2 py-0.5 rounded-full font-semibold' }
 }
 
