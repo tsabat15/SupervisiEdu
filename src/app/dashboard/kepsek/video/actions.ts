@@ -36,6 +36,16 @@ export async function reviewVideo(params: {
   const now = new Date().toISOString()
   const catatan = params.kepsek_note.trim()
 
+  const { data: existing } = (await supabase
+    .from('teaching_videos')
+    .select('id, teacher_id, title, status')
+    .eq('id', params.id)
+    .single()) as unknown as {
+    data: { id: string; teacher_id: string; title: string; status: VideoStatus } | null
+  }
+
+  if (!existing) return { error: 'Video tidak ditemukan.' }
+
   const { error } = await supabase
     .from('teaching_videos')
     .update({
@@ -49,22 +59,14 @@ export async function reviewVideo(params: {
 
   if (error) return { error: error.message }
 
-  if (params.status === 'sudah_ditinjau') {
-    const { data: videoRow } = (await supabase
-      .from('teaching_videos')
-      .select('teacher_id, title')
-      .eq('id', params.id)
-      .single()) as unknown as { data: { teacher_id: string; title: string } | null }
-
-    if (videoRow) {
-      const admin = createAdminClient()
-      await admin.from('notifications').insert({
-        user_id: videoRow.teacher_id,
-        title: 'Video mengajar Anda sudah ditinjau',
-        message: `Video "${videoRow.title}" sudah ditinjau oleh kepala sekolah.`,
-        link: `/dashboard/guru/video/${params.id}`,
-      } as never)
-    }
+  if (params.status === 'sudah_ditinjau' && existing.status !== 'sudah_ditinjau') {
+    const admin = createAdminClient()
+    await admin.from('notifications').insert({
+      user_id: existing.teacher_id,
+      title: 'Video mengajar Anda sudah ditinjau',
+      message: `Video "${existing.title}" sudah ditinjau oleh kepala sekolah.`,
+      link: `/dashboard/guru/video/${params.id}`,
+    } as never)
   }
 
   revalidatePath('/dashboard/kepsek/video')

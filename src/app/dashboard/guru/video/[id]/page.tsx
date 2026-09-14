@@ -115,71 +115,65 @@ export default async function GuruVideoDetailPage({
         </header>
 
         <main className="px-4 py-6 md:px-8 md:py-8 max-w-2xl mx-auto w-full space-y-5">
+          {video.kepsek_note && (
+            <section className="rounded-xl border border-amber-200 bg-amber-50/40">
+              <div className="px-5 md:px-6 py-3.5 border-b border-slate-100 flex items-center gap-2">
+                <MessageSquareText className="w-4 h-4 text-amber-700 shrink-0" />
+                <h3 className="font-heading text-base font-bold text-[#002147]">
+                  Catatan Kepala Sekolah
+                </h3>
+              </div>
+              <div className="px-5 md:px-6 py-4 md:py-5">
+                <p className="font-body text-sm text-slate-800 whitespace-pre-wrap leading-relaxed">
+                  {video.kepsek_note}
+                </p>
+                {(reviewerName || video.reviewed_at) && (
+                  <p className="font-body text-xs text-slate-500 mt-3 pt-3 border-t border-slate-200/70">
+                    Ditinjau oleh{' '}
+                    <span className="font-semibold text-slate-700">
+                      {reviewerName ?? 'kepala sekolah'}
+                    </span>
+                    {video.reviewed_at && <> · {formatDateTime(video.reviewed_at)}</>}
+                  </p>
+                )}
+              </div>
+            </section>
+          )}
+
           {isEditable ? (
             <div className="bg-white rounded-xl border border-slate-200 shadow-sm px-5 md:px-6 py-5">
               <VideoForm mode="edit" initialData={video} jadwalOptions={jadwalOptions} />
             </div>
           ) : (
-            <>
-              <div className="bg-white rounded-xl border border-slate-200 shadow-sm px-5 md:px-6 py-5 space-y-4">
+            <div className="bg-white rounded-xl border border-slate-200 shadow-sm px-5 md:px-6 py-5 space-y-4">
+              <div>
+                <p className="font-body text-[11px] font-semibold tracking-wider text-slate-500 uppercase">
+                  Mata Pelajaran · Kelas
+                </p>
+                <p className="font-body text-sm text-slate-800 mt-1">
+                  {video.subject} · {video.class_name}
+                </p>
+              </div>
+              {video.teacher_note && (
                 <div>
                   <p className="font-body text-[11px] font-semibold tracking-wider text-slate-500 uppercase">
-                    Mata Pelajaran · Kelas
+                    Catatan Pengantar Anda
                   </p>
-                  <p className="font-body text-sm text-slate-800 mt-1">
-                    {video.subject} · {video.class_name}
+                  <p className="font-body text-sm text-slate-800 mt-1 whitespace-pre-wrap leading-relaxed">
+                    {video.teacher_note}
                   </p>
                 </div>
-                {video.teacher_note && (
-                  <div>
-                    <p className="font-body text-[11px] font-semibold tracking-wider text-slate-500 uppercase">
-                      Catatan Pengantar Anda
-                    </p>
-                    <p className="font-body text-sm text-slate-800 mt-1 whitespace-pre-wrap leading-relaxed">
-                      {video.teacher_note}
-                    </p>
-                  </div>
-                )}
-                <a
-                  href={video.video_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg font-body text-sm font-semibold text-[#002147] border border-[#002147]/20 hover:bg-[#002147]/5 transition"
-                >
-                  <ExternalLink className="w-4 h-4" />
-                  Buka Video
-                </a>
-              </div>
-
-              <section className="rounded-xl border border-amber-200 bg-amber-50/40">
-                <div className="px-5 md:px-6 py-3.5 border-b border-slate-100 flex items-center gap-2">
-                  <MessageSquareText className="w-4 h-4 text-amber-700 shrink-0" />
-                  <h3 className="font-heading text-base font-bold text-[#002147]">
-                    Catatan Kepala Sekolah
-                  </h3>
-                </div>
-                <div className="px-5 md:px-6 py-4 md:py-5">
-                  {video.kepsek_note ? (
-                    <p className="font-body text-sm text-slate-800 whitespace-pre-wrap leading-relaxed">
-                      {video.kepsek_note}
-                    </p>
-                  ) : (
-                    <p className="font-body text-sm italic text-slate-500">
-                      Belum ada catatan tertulis dari kepala sekolah.
-                    </p>
-                  )}
-                  {(reviewerName || video.reviewed_at) && (
-                    <p className="font-body text-xs text-slate-500 mt-3 pt-3 border-t border-slate-200/70">
-                      Ditinjau oleh{' '}
-                      <span className="font-semibold text-slate-700">
-                        {reviewerName ?? 'kepala sekolah'}
-                      </span>
-                      {video.reviewed_at && <> · {formatDateTime(video.reviewed_at)}</>}
-                    </p>
-                  )}
-                </div>
-              </section>
-            </>
+              )}
+              <a
+                href={video.video_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg font-body text-sm font-semibold text-[#002147] border border-[#002147]/20 hover:bg-[#002147]/5 transition"
+              >
+                <ExternalLink className="w-4 h-4" />
+                Buka Video
+              </a>
+            </div>
           )}
         </main>
       </div>
