@@ -26,6 +26,7 @@ export type ScheduleStatus = 'dijadwalkan' | 'selesai' | 'dibatalkan'
 export type ReportStatus = 'draft' | 'submitted' | 'approved'
 export type RmpStatus = 'draft' | 'submitted' | 'approved' | 'revision'
 export type DeletionRequestStatus = 'pending' | 'approved' | 'rejected'
+export type VideoStatus = 'belum_ditinjau' | 'sudah_ditinjau'
 
 export interface Database {
   public: {
@@ -363,6 +364,53 @@ export interface Database {
           is_read?: boolean
         }
       }
+      teaching_videos: {
+        Row: {
+          id: string
+          teacher_id: string
+          schedule_id: string | null
+          title: string
+          subject: string
+          class_name: string
+          video_url: string
+          teacher_note: string | null
+          status: VideoStatus
+          kepsek_note: string | null
+          reviewed_by: string | null
+          reviewed_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          teacher_id: string
+          schedule_id?: string | null
+          title: string
+          subject: string
+          class_name: string
+          video_url: string
+          teacher_note?: string | null
+          status?: VideoStatus
+          kepsek_note?: string | null
+          reviewed_by?: string | null
+          reviewed_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          schedule_id?: string | null
+          title?: string
+          subject?: string
+          class_name?: string
+          video_url?: string
+          teacher_note?: string | null
+          status?: VideoStatus
+          kepsek_note?: string | null
+          reviewed_by?: string | null
+          reviewed_at?: string | null
+          updated_at?: string
+        }
+      }
     }
     Views: Record<string, never>
     Functions: Record<string, never>
@@ -371,6 +419,7 @@ export interface Database {
       schedule_status: ScheduleStatus
       report_status: ReportStatus
       rmp_status: RmpStatus
+      video_status: VideoStatus
     }
   }
 }
@@ -382,3 +431,4 @@ export type RmpForm = Database['public']['Tables']['rmp_forms']['Row']
 export type SchoolSettings = Database['public']['Tables']['school_settings']['Row']
 export type AppNotification = Database['public']['Tables']['notifications']['Row']
 export type RmpDeletionRequest = Database['public']['Tables']['rmp_deletion_requests']['Row']
+export type TeachingVideo = Database['public']['Tables']['teaching_videos']['Row']
