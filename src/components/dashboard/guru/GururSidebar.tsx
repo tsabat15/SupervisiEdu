@@ -3,13 +3,14 @@
 import { useEffect, useRef, useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { BookOpen, Calendar, FileText, Home, LogOut, Menu, UserCircle, X } from 'lucide-react'
+import { BookOpen, Calendar, FileText, Home, LogOut, Menu, UserCircle, Video, X } from 'lucide-react'
 import { createBrowserClient } from '@/src/utils/supabase/client'
 
 const navItems = [
   { label: 'Beranda', href: '/dashboard/guru', icon: Home },
   { label: 'RMP Saya', href: '/dashboard/guru/rmp', icon: BookOpen },
   { label: 'Jadwal Supervisi', href: '/dashboard/guru/jadwal', icon: Calendar },
+  { label: 'Video Mengajar', href: '/dashboard/guru/video', icon: Video },
   { label: 'Laporan Saya', href: '/dashboard/guru/laporan', icon: FileText },
   { label: 'Profil Saya', href: '/dashboard/guru/profil', icon: UserCircle },
 ]
