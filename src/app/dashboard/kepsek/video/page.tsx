@@ -53,9 +53,9 @@ export default async function KepsekVideoListPage() {
     guruMap = new Map((gurus ?? []).map((g) => [g.id, g.full_name]))
   }
 
-  const rows: KepsekVideoRow[] = baseRows.map((v) => ({
+  const rows: KepsekVideoRow[] = baseRows.map(({ teacher_id, ...v }) => ({
     ...v,
-    guru_name: guruMap.get(v.teacher_id) ?? null,
+    guru_name: guruMap.get(teacher_id) ?? null,
   }))
 
   return (
