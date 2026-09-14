@@ -12,6 +12,7 @@ import {
   LogOut,
   Menu,
   UserCircle,
+  Video,
   X,
 } from 'lucide-react'
 import { createBrowserClient } from '@/src/utils/supabase/client'
@@ -20,6 +21,7 @@ const navItems = [
   { label: 'Dasbor', href: '/dashboard/kepsek', icon: Home },
   { label: 'Pengelolaan Jadwal', href: '/dashboard/kepsek/jadwal', icon: CalendarDays },
   { label: 'RMP Guru', href: '/dashboard/kepsek/rmp', icon: BookOpen },
+  { label: 'Video Mengajar', href: '/dashboard/kepsek/video', icon: Video },
   { label: 'Bank Instrumen', href: '/dashboard/kepsek/instrumen', icon: ClipboardList },
   { label: 'Laporan Supervisi', href: '/dashboard/kepsek/laporan', icon: FileText },
   { label: 'Profil Saya', href: '/dashboard/kepsek/profil', icon: UserCircle },
