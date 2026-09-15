@@ -10,13 +10,14 @@ import type { RmpStatus } from '@/src/types/database'
 export const dynamic = 'force-dynamic'
 
 function getTahunAjaranStartYear(date: Date): number {
-  const month = date.getMonth() // 0-indexed; 6 = July
-  return month >= 6 ? date.getFullYear() : date.getFullYear() - 1
+  const jakarta = new Date(date.getTime() + 7 * 60 * 60 * 1000)
+  const month = jakarta.getUTCMonth() // 0-indexed; 6 = July
+  return month >= 6 ? jakarta.getUTCFullYear() : jakarta.getUTCFullYear() - 1
 }
 
 function getTahunAjaranRange(startYear: number): { startIso: string; endIso: string; label: string } {
-  const start = new Date(Date.UTC(startYear, 6, 1))
-  const end = new Date(Date.UTC(startYear + 1, 6, 1))
+  const start = new Date(Date.UTC(startYear, 6, 1) - 7 * 60 * 60 * 1000)
+  const end = new Date(Date.UTC(startYear + 1, 6, 1) - 7 * 60 * 60 * 1000)
   return {
     startIso: start.toISOString(),
     endIso: end.toISOString(),
@@ -65,7 +66,8 @@ export default async function AdminRmpPage({
 
   const currentStartYear = getTahunAjaranStartYear(new Date())
   const parsedYear = tahun ? parseInt(tahun, 10) : NaN
-  const viewedStartYear = Number.isFinite(parsedYear) ? parsedYear : currentStartYear
+  const isValidYear = Number.isFinite(parsedYear) && parsedYear >= 2000 && parsedYear <= currentStartYear
+  const viewedStartYear = isValidYear ? parsedYear : currentStartYear
   const { startIso, endIso, label } = getTahunAjaranRange(viewedStartYear)
 
   const [{ data: rmpData }, { data: reqData }] = (await Promise.all([
@@ -103,6 +105,17 @@ export default async function AdminRmpPage({
   }
 
   const judulMap = new Map(rmpBase.map((r) => [r.id, r.judul]))
+
+  const reqRmpIds = reqBase.map((r) => r.rmp_id)
+  if (reqRmpIds.length > 0) {
+    const { data: reqRmpTitles } = (await supabase
+      .from('rmp_forms')
+      .select('id, judul')
+      .in('id', reqRmpIds)) as unknown as { data: { id: string; judul: string }[] | null }
+    for (const r of reqRmpTitles ?? []) {
+      if (!judulMap.has(r.id)) judulMap.set(r.id, r.judul)
+    }
+  }
 
   const pendingByRmp: Record<string, string> = {}
   for (const r of reqBase) pendingByRmp[r.rmp_id] = r.id
