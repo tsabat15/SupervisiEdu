@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Trash2, Users } from 'lucide-react'
 import type { Profile, UserRole } from '@/src/types/database'
 import { deleteUser } from '@/src/app/dashboard/admin/pengguna/actions'
+import Avatar from '@/src/components/dashboard/Avatar'
 
 const ROLE_BADGE: Record<UserRole, { label: string; className: string }> = {
   admin: {
@@ -18,15 +19,6 @@ const ROLE_BADGE: Record<UserRole, { label: string; className: string }> = {
     label: 'Kepala Sekolah',
     className: 'bg-indigo-50 text-indigo-700 border border-indigo-200',
   },
-}
-
-function getInitials(name: string) {
-  return name
-    .split(' ')
-    .slice(0, 2)
-    .map((n) => n[0])
-    .join('')
-    .toUpperCase()
 }
 
 interface Props {
@@ -77,11 +69,7 @@ export default function UserTable({ users, onToast }: Props) {
               <tr key={user.id} className="hover:bg-slate-50/60 transition-colors">
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
-                      <span className="font-body text-xs font-bold text-amber-700">
-                        {getInitials(user.full_name)}
-                      </span>
-                    </div>
+                    <Avatar name={user.full_name} avatarUrl={user.avatar_url} size="sm" />
                     <span className="font-body font-medium text-slate-800">{user.full_name}</span>
                   </div>
                 </td>
