@@ -2,9 +2,12 @@
 
 import { useEffect, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import {
   AlertTriangle,
   CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
   Clock,
   Loader2,
   MailQuestion,
@@ -66,9 +69,19 @@ interface Props {
   rmps: AdminRmpRow[]
   requests: DeletionReqRow[]
   pendingByRmp: Record<string, string>
+  tahunAjaranLabel: string
+  prevHref: string
+  nextHref: string | null
 }
 
-export default function AdminRmpClient({ rmps, requests, pendingByRmp }: Props) {
+export default function AdminRmpClient({
+  rmps,
+  requests,
+  pendingByRmp,
+  tahunAjaranLabel,
+  prevHref,
+  nextHref,
+}: Props) {
   const router = useRouter()
   const [deleteTarget, setDeleteTarget] = useState<AdminRmpRow | null>(null)
   const [rejectTarget, setRejectTarget] = useState<DeletionReqRow | null>(null)
@@ -210,11 +223,44 @@ export default function AdminRmpClient({ rmps, requests, pendingByRmp }: Props) 
       </section>
 
       <section className="bg-white rounded-xl border border-slate-200 shadow-sm">
-        <div className="px-5 md:px-6 py-4 border-b border-slate-100">
-          <h2 className="font-heading text-base font-bold text-slate-900">Semua RMP</h2>
-          <p className="font-body text-xs text-slate-500 mt-0.5">
-            {rmps.length} modul terdaftar dari semua guru.
-          </p>
+        <div className="px-5 md:px-6 py-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div>
+            <h2 className="font-heading text-base font-bold text-slate-900">Semua RMP</h2>
+            <p className="font-body text-xs text-slate-500 mt-0.5">
+              {rmps.length} modul terdaftar pada tahun ajaran ini.
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Link
+              href={prevHref}
+              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg font-body text-xs font-semibold text-slate-600 border border-slate-200 hover:bg-slate-50 transition"
+              aria-label="Tahun ajaran sebelumnya"
+            >
+              <ChevronLeft className="w-3.5 h-3.5" />
+              Sebelumnya
+            </Link>
+            <span className="font-body text-xs font-bold text-[#002147] px-2 whitespace-nowrap">
+              Tahun Ajaran {tahunAjaranLabel}
+            </span>
+            {nextHref ? (
+              <Link
+                href={nextHref}
+                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg font-body text-xs font-semibold text-slate-600 border border-slate-200 hover:bg-slate-50 transition"
+                aria-label="Tahun ajaran berikutnya"
+              >
+                Berikutnya
+                <ChevronRight className="w-3.5 h-3.5" />
+              </Link>
+            ) : (
+              <span
+                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg font-body text-xs font-semibold text-slate-300 border border-slate-100 cursor-not-allowed"
+                aria-disabled="true"
+              >
+                Berikutnya
+                <ChevronRight className="w-3.5 h-3.5" />
+              </span>
+            )}
+          </div>
         </div>
 
         {rmps.length === 0 ? (

@@ -9,6 +9,21 @@ import type { RmpStatus } from '@/src/types/database'
 
 export const dynamic = 'force-dynamic'
 
+function getTahunAjaranStartYear(date: Date): number {
+  const month = date.getMonth() // 0-indexed; 6 = July
+  return month >= 6 ? date.getFullYear() : date.getFullYear() - 1
+}
+
+function getTahunAjaranRange(startYear: number): { startIso: string; endIso: string; label: string } {
+  const start = new Date(Date.UTC(startYear, 6, 1))
+  const end = new Date(Date.UTC(startYear + 1, 6, 1))
+  return {
+    startIso: start.toISOString(),
+    endIso: end.toISOString(),
+    label: `${startYear}/${startYear + 1}`,
+  }
+}
+
 interface RmpBase {
   id: string
   judul: string
@@ -27,7 +42,12 @@ interface ReqBase {
   created_at: string
 }
 
-export default async function AdminRmpPage() {
+export default async function AdminRmpPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ tahun?: string }>
+}) {
+  const { tahun } = await searchParams
   const supabase = await createServerClient()
 
   const {
@@ -43,10 +63,17 @@ export default async function AdminRmpPage() {
 
   if (!profile || profile.role !== 'admin') redirect('/dashboard')
 
+  const currentStartYear = getTahunAjaranStartYear(new Date())
+  const parsedYear = tahun ? parseInt(tahun, 10) : NaN
+  const viewedStartYear = Number.isFinite(parsedYear) ? parsedYear : currentStartYear
+  const { startIso, endIso, label } = getTahunAjaranRange(viewedStartYear)
+
   const [{ data: rmpData }, { data: reqData }] = (await Promise.all([
     supabase
       .from('rmp_forms')
       .select('id, judul, tema, status, guru_id, created_at, updated_at')
+      .gte('created_at', startIso)
+      .lt('created_at', endIso)
       .order('created_at', { ascending: false }),
     supabase
       .from('rmp_deletion_requests')
@@ -107,7 +134,14 @@ export default async function AdminRmpPage() {
         </header>
 
         <main className="px-4 py-6 md:px-8 md:py-8 max-w-5xl mx-auto w-full">
-          <AdminRmpClient rmps={rmps} requests={requests} pendingByRmp={pendingByRmp} />
+          <AdminRmpClient
+            rmps={rmps}
+            requests={requests}
+            pendingByRmp={pendingByRmp}
+            tahunAjaranLabel={label}
+            prevHref={`/dashboard/admin/rmp?tahun=${viewedStartYear - 1}`}
+            nextHref={viewedStartYear < currentStartYear ? `/dashboard/admin/rmp?tahun=${viewedStartYear + 1}` : null}
+          />
         </main>
       </div>
     </div>
