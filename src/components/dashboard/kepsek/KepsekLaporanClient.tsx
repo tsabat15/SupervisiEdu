@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { FilePlus, FileText } from 'lucide-react'
+import Avatar from '@/src/components/dashboard/Avatar'
 import type { ReportStatus } from '@/src/types/database'
 
 const INSTRUMENT_SHORT: Record<string, string> = {
@@ -21,6 +22,7 @@ function getPredikat(score: number): string {
 interface LaporanRow {
   id: string
   teacher_name: string | null
+  teacher_avatar_url: string | null
   subject: string
   class_name: string
   visit_date: string
@@ -145,7 +147,14 @@ export default function KepsekLaporanClient({ initialReports }: Props) {
                     className="hover:bg-slate-50/60 transition cursor-pointer"
                   >
                     <td className="px-5 md:px-6 py-4 font-body font-medium text-slate-800">
-                      {r.teacher_name ?? <span className="text-slate-400">—</span>}
+                      {r.teacher_name ? (
+                        <div className="flex items-center gap-2">
+                          <Avatar name={r.teacher_name} avatarUrl={r.teacher_avatar_url} size="sm" />
+                          <span>{r.teacher_name}</span>
+                        </div>
+                      ) : (
+                        <span className="text-slate-400">—</span>
+                      )}
                     </td>
                     <td className="px-5 md:px-6 py-4 font-body text-slate-700">{r.subject}</td>
                     <td className="px-5 md:px-6 py-4 font-body text-slate-700">{r.class_name}</td>

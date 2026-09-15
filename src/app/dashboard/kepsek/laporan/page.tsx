@@ -9,6 +9,7 @@ export const dynamic = 'force-dynamic'
 interface LaporanRow {
   id: string
   teacher_name: string | null
+  teacher_avatar_url: string | null
   subject: string
   class_name: string
   visit_date: string
@@ -57,20 +58,23 @@ export default async function KepsekLaporanPage() {
   const reports = rawReports ?? []
   const teacherIds = Array.from(new Set(reports.map((r) => r.teacher_id)))
 
-  let teacherMap = new Map<string, string>()
+  let teacherMap = new Map<string, { full_name: string; avatar_url: string | null }>()
   if (teacherIds.length > 0) {
     const { data: teachers } = (await supabase
       .from('profiles')
-      .select('id, full_name')
+      .select('id, full_name, avatar_url')
       .in('id', teacherIds)) as unknown as {
-      data: { id: string; full_name: string }[] | null
+      data: { id: string; full_name: string; avatar_url: string | null }[] | null
     }
-    teacherMap = new Map((teachers ?? []).map((t) => [t.id, t.full_name]))
+    teacherMap = new Map(
+      (teachers ?? []).map((t) => [t.id, { full_name: t.full_name, avatar_url: t.avatar_url }]),
+    )
   }
 
   const rows: LaporanRow[] = reports.map((r) => ({
     id: r.id,
-    teacher_name: teacherMap.get(r.teacher_id) ?? null,
+    teacher_name: teacherMap.get(r.teacher_id)?.full_name ?? null,
+    teacher_avatar_url: teacherMap.get(r.teacher_id)?.avatar_url ?? null,
     subject: r.subject,
     class_name: r.class_name,
     visit_date: r.visit_date,
