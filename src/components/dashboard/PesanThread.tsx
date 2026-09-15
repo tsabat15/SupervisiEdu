@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, useTransition } from 'react'
+import { useCallback, useEffect, useRef, useState, useTransition } from 'react'
 import { Loader2, Pencil, Send, Trash2, X } from 'lucide-react'
 import { createBrowserClient } from '@/src/utils/supabase/client'
 import { sendMessage, editMessage, deleteMessage } from '@/src/app/dashboard/pesan/actions'
@@ -18,6 +18,7 @@ function formatTime(value: string) {
   return new Date(value).toLocaleTimeString('id-ID', {
     hour: '2-digit',
     minute: '2-digit',
+    timeZone: 'Asia/Jakarta',
   })
 }
 
@@ -27,6 +28,7 @@ function formatDateDivider(value: string) {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
+    timeZone: 'Asia/Jakarta',
   })
 }
 
@@ -51,6 +53,19 @@ export default function PesanThread({
     bottomRef.current?.scrollIntoView({ block: 'end' })
   }, [messages.length])
 
+  const resyncMessages = useCallback(async () => {
+    if (!conversationId) return
+    const { data: fresh } = await supabase
+      .from('messages')
+      .select('*')
+      .eq('conversation_id', conversationId)
+      .order('created_at', { ascending: true })
+    setMessages((fresh as Message[] | null) ?? [])
+  }, [supabase, conversationId])
+
+  // Subscribe to message inserts/updates once a conversation exists. Every
+  // fresh subscribe (including reconnects after a dropped socket) triggers a
+  // full resync so we never silently miss messages sent during a gap.
   useEffect(() => {
     if (!conversationId) return
 
@@ -85,12 +100,73 @@ export default function PesanThread({
           setMessages((prev) => prev.map((m) => (m.id === updated.id ? updated : m)))
         },
       )
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') resyncMessages()
+      })
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [supabase, conversationId, resyncMessages])
+
+  // No conversation yet: watch for the counterpart creating one (by sending
+  // the first message from their side) so this viewer picks it up without a
+  // manual refresh. Tears itself down once conversationId becomes non-null.
+  useEffect(() => {
+    if (conversationId) return
+
+    const channel = supabase
+      .channel(`conversations-watch:${currentUserId}:${counterpartId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'conversations',
+          filter: `guru_id=eq.${currentUserId}`,
+        },
+        (payload) => {
+          const row = payload.new as { id: string; guru_id: string; kepsek_id: string }
+          if (row.guru_id === counterpartId || row.kepsek_id === counterpartId) {
+            setConversationId(row.id)
+          }
+        },
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'conversations',
+          filter: `kepsek_id=eq.${currentUserId}`,
+        },
+        (payload) => {
+          const row = payload.new as { id: string; guru_id: string; kepsek_id: string }
+          if (row.guru_id === counterpartId || row.kepsek_id === counterpartId) {
+            setConversationId(row.id)
+          }
+        },
+      )
       .subscribe()
 
     return () => {
       supabase.removeChannel(channel)
     }
-  }, [supabase, conversationId])
+  }, [supabase, conversationId, currentUserId, counterpartId])
+
+  // Catch up on missed messages when the tab regains focus/visibility (e.g.
+  // after laptop sleep or being backgrounded), independent of socket status.
+  useEffect(() => {
+    function handleVisibilityChange() {
+      if (document.visibilityState === 'visible' && conversationId) {
+        resyncMessages()
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
+  }, [conversationId, resyncMessages])
 
   function handleSend() {
     const text = draft.trim()
@@ -244,7 +320,7 @@ export default function PesanThread({
                       {m.edited_at && !isDeleted && ' · diedit'}
                     </span>
                     {isMine && !isDeleted && !isEditing && (
-                      <span className="hidden group-hover:flex items-center gap-1">
+                      <span className="flex items-center gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 md:focus-within:opacity-100 transition-opacity">
                         <button
                           type="button"
                           onClick={() => startEdit(m)}

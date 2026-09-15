@@ -14,11 +14,21 @@ function formatRelative(value: string | null) {
   if (!value) return null
   const date = new Date(value)
   const now = new Date()
-  const isToday = date.toDateString() === now.toDateString()
+  const dayKey = (d: Date) =>
+    d.toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' })
+  const isToday = dayKey(date) === dayKey(now)
   if (isToday) {
-    return date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
+    return date.toLocaleTimeString('id-ID', {
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZone: 'Asia/Jakarta',
+    })
   }
-  return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })
+  return date.toLocaleDateString('id-ID', {
+    day: 'numeric',
+    month: 'short',
+    timeZone: 'Asia/Jakarta',
+  })
 }
 
 interface Props {
