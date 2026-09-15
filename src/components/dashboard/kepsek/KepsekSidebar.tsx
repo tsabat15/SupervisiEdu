@@ -16,6 +16,7 @@ import {
   X,
 } from 'lucide-react'
 import { createBrowserClient } from '@/src/utils/supabase/client'
+import SidebarUserFooter from '@/src/components/dashboard/SidebarUserFooter'
 
 const navItems = [
   { label: 'Dasbor', href: '/dashboard/kepsek', icon: Home },
@@ -116,15 +117,18 @@ export default function KepsekSidebar() {
           })}
         </nav>
 
-        <div className="px-4 py-5 border-t border-white/10">
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg font-body text-sm font-medium text-white/40 hover:bg-red-500/10 hover:text-red-400 transition-all"
-          >
-            <LogOut className="w-4 h-4 shrink-0" />
-            Keluar
-          </button>
+        <div className="border-t border-white/10">
+          <SidebarUserFooter roleLabel="Kepala Sekolah" />
+          <div className="px-4 pb-5">
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg font-body text-sm font-medium text-white/40 hover:bg-red-500/10 hover:text-red-400 transition-all"
+            >
+              <LogOut className="w-4 h-4 shrink-0" />
+              Keluar
+            </button>
+          </div>
         </div>
       </aside>
     </>
