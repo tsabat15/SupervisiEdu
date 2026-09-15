@@ -106,6 +106,10 @@ export default function PesanThread({
       if (result.conversationId && result.conversationId !== conversationId) {
         setConversationId(result.conversationId)
       }
+      if (result.message) {
+        const sent = result.message
+        setMessages((prev) => (prev.some((m) => m.id === sent.id) ? prev : [...prev, sent]))
+      }
     })
   }
 

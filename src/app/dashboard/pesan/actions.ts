@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { createServerClient } from '@/src/utils/supabase/server'
 import { createAdminClient } from '@/src/utils/supabase/admin'
+import type { Message } from '@/src/types/database'
 
 async function requireUser(): Promise<{ userId?: string; role?: string; error?: string }> {
   const supabase = await createServerClient()
@@ -57,7 +58,7 @@ async function resolveConversation(
 export async function sendMessage(
   counterpartId: string,
   body: string,
-): Promise<{ conversationId?: string; error?: string }> {
+): Promise<{ conversationId?: string; message?: Message; error?: string }> {
   const { userId, role, error: authErr } = await requireUser()
   if (authErr || !userId || !role) return { error: authErr ?? 'Tidak terautentikasi.' }
 
@@ -77,12 +78,16 @@ export async function sendMessage(
   const supabase = await createServerClient()
   const now = new Date().toISOString()
 
-  const { error: msgErr } = await supabase.from('messages').insert({
-    conversation_id: conversationId,
-    sender_id: userId,
-    body: text,
-  } as never)
-  if (msgErr) return { error: msgErr.message }
+  const { data: insertedMessage, error: msgErr } = (await supabase
+    .from('messages')
+    .insert({
+      conversation_id: conversationId,
+      sender_id: userId,
+      body: text,
+    } as never)
+    .select('*')
+    .single()) as unknown as { data: Message | null; error: { message: string } | null }
+  if (msgErr || !insertedMessage) return { error: msgErr?.message ?? 'Gagal mengirim pesan.' }
 
   await supabase
     .from('conversations')
@@ -109,7 +114,7 @@ export async function sendMessage(
 
   revalidatePath('/dashboard/guru/pesan')
   revalidatePath('/dashboard/kepsek/pesan')
-  return { conversationId }
+  return { conversationId, message: insertedMessage }
 }
 
 export async function editMessage(messageId: string, body: string): Promise<{ error?: string }> {
