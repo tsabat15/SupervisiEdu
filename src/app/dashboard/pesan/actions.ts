@@ -36,6 +36,17 @@ async function resolveConversation(
 
   const supabase = await createServerClient()
 
+  const expectedCounterpartRole = userRole === 'guru' ? 'kepsek' : 'guru'
+  const { data: counterpartProfile } = (await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', counterpartId)
+    .maybeSingle()) as unknown as { data: { role: string } | null }
+
+  if (!counterpartProfile || counterpartProfile.role !== expectedCounterpartRole) {
+    return { error: 'Penerima pesan tidak valid.' }
+  }
+
   const { data: existing } = (await supabase
     .from('conversations')
     .select('id')
@@ -104,13 +115,24 @@ export async function sendMessage(
   const senderName = senderProfile?.full_name ?? 'Seseorang'
   const recipientId = role === 'guru' ? kepsekId : guruId
   const recipientRole = role === 'guru' ? 'kepsek' : 'guru'
+  const notificationLink = `/dashboard/${recipientRole}/pesan/${userId}`
 
-  await admin.from('notifications').insert({
-    user_id: recipientId,
-    title: 'Pesan baru',
-    message: `${senderName} mengirim pesan baru.`,
-    link: `/dashboard/${recipientRole}/pesan/${userId}`,
-  } as never)
+  const { data: existingNotif } = await admin
+    .from('notifications')
+    .select('id')
+    .eq('user_id', recipientId)
+    .eq('link', notificationLink)
+    .eq('is_read', false)
+    .maybeSingle()
+
+  if (!existingNotif) {
+    await admin.from('notifications').insert({
+      user_id: recipientId,
+      title: 'Pesan baru',
+      message: `${senderName} mengirim pesan baru.`,
+      link: notificationLink,
+    } as never)
+  }
 
   revalidatePath('/dashboard/guru/pesan')
   revalidatePath('/dashboard/kepsek/pesan')

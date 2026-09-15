@@ -53,7 +53,9 @@ export default async function KepsekPesanThreadPage({
       .select('*')
       .eq('conversation_id', conversation.id)
       .order('created_at', { ascending: true })) as unknown as { data: Message[] | null }
-    initialMessages = messages ?? []
+    initialMessages = (messages ?? []).map((m) =>
+      m.deleted_at ? { ...m, body: '' } : m,
+    )
   }
 
   return (

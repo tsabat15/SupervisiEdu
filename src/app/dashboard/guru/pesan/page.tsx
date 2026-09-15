@@ -13,6 +13,16 @@ export default async function GuruPesanPage() {
   } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
+  const { data: profile } = (await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()) as unknown as { data: { role: string } | null }
+
+  if (!profile || (profile.role !== 'guru' && profile.role !== 'admin')) {
+    redirect('/dashboard')
+  }
+
   const { data: kepseks } = (await supabase
     .from('profiles')
     .select('id, full_name')

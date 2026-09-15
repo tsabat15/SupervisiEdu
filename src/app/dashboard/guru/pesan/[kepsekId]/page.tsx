@@ -21,6 +21,16 @@ export default async function GuruPesanThreadPage({
   } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
+  const { data: profile } = (await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()) as unknown as { data: { role: string } | null }
+
+  if (!profile || (profile.role !== 'guru' && profile.role !== 'admin')) {
+    redirect('/dashboard')
+  }
+
   const { data: kepsek } = (await supabase
     .from('profiles')
     .select('full_name, role')
@@ -43,7 +53,9 @@ export default async function GuruPesanThreadPage({
       .select('*')
       .eq('conversation_id', conversation.id)
       .order('created_at', { ascending: true })) as unknown as { data: Message[] | null }
-    initialMessages = messages ?? []
+    initialMessages = (messages ?? []).map((m) =>
+      m.deleted_at ? { ...m, body: '' } : m,
+    )
   }
 
   return (
