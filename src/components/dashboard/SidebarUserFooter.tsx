@@ -32,8 +32,18 @@ export default function SidebarUserFooter({ roleLabel }: Props) {
       if (!cancelled && data) setProfile(data)
     }
     load()
+
+    function handleAvatarUpdated(e: Event) {
+      const detail = (e as CustomEvent<{ avatarUrl: string | null }>).detail
+      if (!cancelled) {
+        setProfile((prev) => (prev ? { ...prev, avatar_url: detail.avatarUrl } : prev))
+      }
+    }
+    window.addEventListener('avatar-updated', handleAvatarUpdated)
+
     return () => {
       cancelled = true
+      window.removeEventListener('avatar-updated', handleAvatarUpdated)
     }
   }, [])
 

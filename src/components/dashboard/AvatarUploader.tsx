@@ -41,6 +41,13 @@ export default function AvatarUploader({ userId, fullName, initialAvatarUrl }: P
 
     setBusy(true)
     try {
+      const { data: files } = await supabase.storage.from(BUCKET).list(userId)
+      if (files && files.length > 0) {
+        await supabase.storage
+          .from(BUCKET)
+          .remove(files.map((f) => `${userId}/${f.name}`))
+      }
+
       const ext = file.name.split('.').pop() || 'jpg'
       const path = `${userId}/avatar.${ext}`
       const { error: upErr } = await supabase.storage
@@ -62,6 +69,7 @@ export default function AvatarUploader({ userId, fullName, initialAvatarUrl }: P
           return
         }
         setAvatarUrl(finalUrl)
+        window.dispatchEvent(new CustomEvent('avatar-updated', { detail: { avatarUrl: finalUrl } }))
         router.refresh()
       })
     } finally {
@@ -73,12 +81,20 @@ export default function AvatarUploader({ userId, fullName, initialAvatarUrl }: P
   function handleRemove() {
     if (!confirm('Hapus foto profil?')) return
     startTransition(async () => {
+      const { data: files } = await supabase.storage.from(BUCKET).list(userId)
+      if (files && files.length > 0) {
+        await supabase.storage
+          .from(BUCKET)
+          .remove(files.map((f) => `${userId}/${f.name}`))
+      }
+
       const result = await updateAvatarUrl(null)
       if (result.error) {
         setError(`Gagal menghapus: ${result.error}`)
         return
       }
       setAvatarUrl(null)
+      window.dispatchEvent(new CustomEvent('avatar-updated', { detail: { avatarUrl: null } }))
       router.refresh()
     })
   }
