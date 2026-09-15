@@ -411,6 +411,50 @@ export interface Database {
           updated_at?: string
         }
       }
+      conversations: {
+        Row: {
+          id: string
+          guru_id: string
+          kepsek_id: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          guru_id: string
+          kepsek_id: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          updated_at?: string
+        }
+      }
+      messages: {
+        Row: {
+          id: string
+          conversation_id: string
+          sender_id: string
+          body: string
+          edited_at: string | null
+          deleted_at: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          conversation_id: string
+          sender_id: string
+          body: string
+          edited_at?: string | null
+          deleted_at?: string | null
+          created_at?: string
+        }
+        Update: {
+          body?: string
+          edited_at?: string | null
+          deleted_at?: string | null
+        }
+      }
     }
     Views: Record<string, never>
     Functions: Record<string, never>
@@ -432,3 +476,5 @@ export type SchoolSettings = Database['public']['Tables']['school_settings']['Ro
 export type AppNotification = Database['public']['Tables']['notifications']['Row']
 export type RmpDeletionRequest = Database['public']['Tables']['rmp_deletion_requests']['Row']
 export type TeachingVideo = Database['public']['Tables']['teaching_videos']['Row']
+export type Conversation = Database['public']['Tables']['conversations']['Row']
+export type Message = Database['public']['Tables']['messages']['Row']
