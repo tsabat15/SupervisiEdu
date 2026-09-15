@@ -62,15 +62,17 @@ export default async function AdminRmpPage() {
     new Set([...rmpBase.map((r) => r.guru_id), ...reqBase.map((r) => r.guru_id)]),
   )
 
-  let nameMap = new Map<string, string>()
+  let nameMap = new Map<string, { full_name: string; avatar_url: string | null }>()
   if (allGuruIds.length > 0) {
     const { data: gurus } = (await supabase
       .from('profiles')
-      .select('id, full_name')
+      .select('id, full_name, avatar_url')
       .in('id', allGuruIds)) as unknown as {
-      data: { id: string; full_name: string }[] | null
+      data: { id: string; full_name: string; avatar_url: string | null }[] | null
     }
-    nameMap = new Map((gurus ?? []).map((g) => [g.id, g.full_name]))
+    nameMap = new Map(
+      (gurus ?? []).map((g) => [g.id, { full_name: g.full_name, avatar_url: g.avatar_url }]),
+    )
   }
 
   const judulMap = new Map(rmpBase.map((r) => [r.id, r.judul]))
@@ -80,12 +82,13 @@ export default async function AdminRmpPage() {
 
   const rmps: AdminRmpRow[] = rmpBase.map((r) => ({
     ...r,
-    guru_name: nameMap.get(r.guru_id) ?? null,
+    guru_name: nameMap.get(r.guru_id)?.full_name ?? null,
+    guru_avatar_url: nameMap.get(r.guru_id)?.avatar_url ?? null,
   }))
 
   const requests: DeletionReqRow[] = reqBase.map((r) => ({
     ...r,
-    guru_name: nameMap.get(r.guru_id) ?? null,
+    guru_name: nameMap.get(r.guru_id)?.full_name ?? null,
     judul: judulMap.get(r.rmp_id) ?? '',
   }))
 

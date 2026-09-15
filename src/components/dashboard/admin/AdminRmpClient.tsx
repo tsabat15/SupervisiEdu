@@ -11,6 +11,7 @@ import {
   Trash2,
   X,
 } from 'lucide-react'
+import Avatar from '@/src/components/dashboard/Avatar'
 import {
   adminDeleteRmp,
   approveDeletionRequest,
@@ -25,6 +26,7 @@ export interface AdminRmpRow {
   status: RmpStatus
   guru_id: string
   guru_name: string | null
+  guru_avatar_url: string | null
   created_at: string
   updated_at: string
 }
@@ -254,7 +256,14 @@ export default function AdminRmpClient({ rmps, requests, pendingByRmp }: Props) 
                         )}
                       </td>
                       <td className="px-5 md:px-6 py-4 font-body text-slate-700">
-                        {r.guru_name ?? <span className="text-slate-400">Tidak diketahui</span>}
+                        {r.guru_name ? (
+                          <div className="flex items-center gap-2">
+                            <Avatar name={r.guru_name} avatarUrl={r.guru_avatar_url} size="sm" />
+                            <span>{r.guru_name}</span>
+                          </div>
+                        ) : (
+                          <span className="text-slate-400">Tidak diketahui</span>
+                        )}
                       </td>
                       <td className="px-5 md:px-6 py-4">
                         <div className="flex flex-wrap items-center gap-1.5">
