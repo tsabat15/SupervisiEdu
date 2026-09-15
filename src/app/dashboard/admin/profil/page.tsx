@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createServerClient } from '@/src/utils/supabase/server'
 import AdminSidebar from '@/src/components/dashboard/AdminSidebar'
-import Avatar from '@/src/components/dashboard/Avatar'
+import AvatarUploader from '@/src/components/dashboard/AvatarUploader'
 import ProfileEditForm from '@/src/components/dashboard/ProfileEditForm'
 import type { Profile } from '@/src/types/database'
 
@@ -38,7 +38,11 @@ export default async function AdminProfilPage() {
         <main className="px-4 py-6 md:px-8 md:py-8 max-w-3xl mx-auto w-full space-y-5">
           <section className="bg-white rounded-xl border border-slate-200 shadow-sm">
             <div className="px-5 md:px-6 py-4 border-b border-slate-100 flex items-center gap-4">
-              <Avatar name={profile.full_name} avatarUrl={profile.avatar_url} size="lg" />
+              <AvatarUploader
+                userId={user.id}
+                fullName={profile.full_name}
+                initialAvatarUrl={profile.avatar_url}
+              />
               <div>
                 <h2 className="font-heading text-base font-bold text-slate-900">
                   {profile.full_name}
