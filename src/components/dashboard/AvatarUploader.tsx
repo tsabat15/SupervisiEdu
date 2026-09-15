@@ -41,13 +41,6 @@ export default function AvatarUploader({ userId, fullName, initialAvatarUrl }: P
 
     setBusy(true)
     try {
-      const { data: files } = await supabase.storage.from(BUCKET).list(userId)
-      if (files && files.length > 0) {
-        await supabase.storage
-          .from(BUCKET)
-          .remove(files.map((f) => `${userId}/${f.name}`))
-      }
-
       const ext = file.name.split('.').pop() || 'jpg'
       const path = `${userId}/avatar.${ext}`
       const { error: upErr } = await supabase.storage
@@ -57,6 +50,18 @@ export default function AvatarUploader({ userId, fullName, initialAvatarUrl }: P
       if (upErr) {
         setError(`Gagal mengunggah: ${upErr.message}`)
         return
+      }
+
+      // Clean up any stale file left from a previous upload with a different
+      // extension, now that the new upload has succeeded — never delete the
+      // old file before the new one is confirmed, or a failed upload would
+      // destroy the user's existing photo instead of leaving it intact.
+      const { data: files } = await supabase.storage.from(BUCKET).list(userId)
+      const stalePaths = (files ?? [])
+        .map((f) => `${userId}/${f.name}`)
+        .filter((p) => p !== path)
+      if (stalePaths.length > 0) {
+        await supabase.storage.from(BUCKET).remove(stalePaths)
       }
 
       const { data: pub } = supabase.storage.from(BUCKET).getPublicUrl(path)
