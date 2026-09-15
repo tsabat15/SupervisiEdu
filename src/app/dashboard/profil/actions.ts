@@ -31,6 +31,32 @@ export async function updateSignatureUrl(
   return {}
 }
 
+export async function updateAvatarUrl(avatarUrl: string | null): Promise<{ error?: string }> {
+  const supabase = await createServerClient()
+
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser()
+
+  if (authError || !user) return { error: 'Tidak terautentikasi.' }
+
+  const { error } = await supabase
+    .from('profiles')
+    .update({
+      avatar_url: avatarUrl,
+      updated_at: new Date().toISOString(),
+    } as never)
+    .eq('id', user.id)
+
+  if (error) return { error: error.message }
+
+  revalidatePath('/dashboard/guru/profil')
+  revalidatePath('/dashboard/kepsek/profil')
+  revalidatePath('/dashboard/admin/profil')
+  return {}
+}
+
 export async function updateProfile(payload: {
   full_name: string
   nip: string | null
