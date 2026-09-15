@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { BookOpen, Calendar, FileText, Home, LogOut, Menu, UserCircle, Video, X } from 'lucide-react'
+import { BookOpen, Calendar, FileText, Home, LogOut, Menu, MessageCircle, UserCircle, Video, X } from 'lucide-react'
 import { createBrowserClient } from '@/src/utils/supabase/client'
 import SidebarUserFooter from '@/src/components/dashboard/SidebarUserFooter'
 
@@ -13,6 +13,7 @@ const navItems = [
   { label: 'Jadwal Supervisi', href: '/dashboard/guru/jadwal', icon: Calendar },
   { label: 'Video Mengajar', href: '/dashboard/guru/video', icon: Video },
   { label: 'Laporan Saya', href: '/dashboard/guru/laporan', icon: FileText },
+  { label: 'Pesan', href: '/dashboard/guru/pesan', icon: MessageCircle },
   { label: 'Profil Saya', href: '/dashboard/guru/profil', icon: UserCircle },
 ]
 

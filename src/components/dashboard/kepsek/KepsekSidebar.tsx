@@ -11,6 +11,7 @@ import {
   Home,
   LogOut,
   Menu,
+  MessageCircle,
   UserCircle,
   Video,
   X,
@@ -25,6 +26,7 @@ const navItems = [
   { label: 'Video Mengajar', href: '/dashboard/kepsek/video', icon: Video },
   { label: 'Bank Instrumen', href: '/dashboard/kepsek/instrumen', icon: ClipboardList },
   { label: 'Laporan Supervisi', href: '/dashboard/kepsek/laporan', icon: FileText },
+  { label: 'Pesan', href: '/dashboard/kepsek/pesan', icon: MessageCircle },
   { label: 'Profil Saya', href: '/dashboard/kepsek/profil', icon: UserCircle },
 ]
 
