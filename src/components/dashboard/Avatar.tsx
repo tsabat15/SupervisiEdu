@@ -1,5 +1,6 @@
 interface Props {
   name: string
+  avatarUrl?: string | null
   size?: 'sm' | 'md' | 'lg'
 }
 
@@ -33,7 +34,18 @@ function getColor(name: string): string {
   return COLORS[hash % COLORS.length]
 }
 
-export default function AvatarInitials({ name, size = 'md' }: Props) {
+export default function Avatar({ name, avatarUrl, size = 'md' }: Props) {
+  if (avatarUrl) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={avatarUrl}
+        alt={`Foto profil ${name}`}
+        className={`${SIZE_CLASSES[size]} rounded-full object-cover shrink-0`}
+      />
+    )
+  }
+
   return (
     <div
       className={`${SIZE_CLASSES[size]} ${getColor(name)} rounded-full flex items-center justify-center font-heading font-bold shrink-0 select-none`}
