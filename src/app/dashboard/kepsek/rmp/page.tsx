@@ -4,6 +4,7 @@ import { BookOpen, Eye } from 'lucide-react'
 import { createServerClient } from '@/src/utils/supabase/server'
 import KepsekSidebar from '@/src/components/dashboard/kepsek/KepsekSidebar'
 import RmpPdfDownloadButton from '@/src/components/dashboard/RmpPdfDownloadButton'
+import Avatar from '@/src/components/dashboard/Avatar'
 import type { RmpStatus } from '@/src/types/database'
 
 export const dynamic = 'force-dynamic'
@@ -19,6 +20,7 @@ interface RmpBase {
 
 interface ReviewRow extends RmpBase {
   guru_name: string | null
+  guru_avatar_url: string | null
 }
 
 const STATUS_BADGE: Record<RmpStatus, { label: string; className: string }> = {
@@ -63,22 +65,23 @@ export default async function KepsekRmpListPage() {
   const baseRows = rmpData ?? []
   const guruIds = Array.from(new Set(baseRows.map((r) => r.guru_id)))
 
-  let guruMap = new Map<string, string>()
+  let guruMap = new Map<string, { full_name: string; avatar_url: string | null }>()
   if (guruIds.length > 0) {
     const { data: gurus, error: guruError } = (await supabase
       .from('profiles')
-      .select('id, full_name')
+      .select('id, full_name, avatar_url')
       .in('id', guruIds)) as unknown as {
-      data: { id: string; full_name: string }[] | null
+      data: { id: string; full_name: string; avatar_url: string | null }[] | null
       error: { message: string } | null
     }
     if (guruError) console.error('[kepsek/rmp] profiles query error:', guruError)
-    guruMap = new Map((gurus ?? []).map((g) => [g.id, g.full_name]))
+    guruMap = new Map((gurus ?? []).map((g) => [g.id, { full_name: g.full_name, avatar_url: g.avatar_url }]))
   }
 
   const rows: ReviewRow[] = baseRows.map((r) => ({
     ...r,
-    guru_name: guruMap.get(r.guru_id) ?? null,
+    guru_name: guruMap.get(r.guru_id)?.full_name ?? null,
+    guru_avatar_url: guruMap.get(r.guru_id)?.avatar_url ?? null,
   }))
 
   return (
@@ -144,7 +147,12 @@ export default async function KepsekRmpListPage() {
                           </p>
                         </td>
                         <td className="px-5 md:px-6 py-4 font-body text-slate-700">
-                          {rmp.guru_name ?? (
+                          {rmp.guru_name ? (
+                            <div className="flex items-center gap-2">
+                              <Avatar name={rmp.guru_name} avatarUrl={rmp.guru_avatar_url} size="sm" />
+                              <span>{rmp.guru_name}</span>
+                            </div>
+                          ) : (
                             <span className="text-slate-400">Tidak diketahui</span>
                           )}
                         </td>
