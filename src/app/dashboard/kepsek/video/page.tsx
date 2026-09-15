@@ -44,18 +44,23 @@ export default async function KepsekVideoListPage() {
   const baseRows = videos ?? []
   const teacherIds = Array.from(new Set(baseRows.map((v) => v.teacher_id)))
 
-  let guruMap = new Map<string, string>()
+  let guruMap = new Map<string, { full_name: string; avatar_url: string | null }>()
   if (teacherIds.length > 0) {
     const { data: gurus } = (await supabase
       .from('profiles')
-      .select('id, full_name')
-      .in('id', teacherIds)) as unknown as { data: { id: string; full_name: string }[] | null }
-    guruMap = new Map((gurus ?? []).map((g) => [g.id, g.full_name]))
+      .select('id, full_name, avatar_url')
+      .in('id', teacherIds)) as unknown as {
+      data: { id: string; full_name: string; avatar_url: string | null }[] | null
+    }
+    guruMap = new Map(
+      (gurus ?? []).map((g) => [g.id, { full_name: g.full_name, avatar_url: g.avatar_url }]),
+    )
   }
 
   const rows: KepsekVideoRow[] = baseRows.map(({ teacher_id, ...v }) => ({
     ...v,
-    guru_name: guruMap.get(teacher_id) ?? null,
+    guru_name: guruMap.get(teacher_id)?.full_name ?? null,
+    guru_avatar_url: guruMap.get(teacher_id)?.avatar_url ?? null,
   }))
 
   return (

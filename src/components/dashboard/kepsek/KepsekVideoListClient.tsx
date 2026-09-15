@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { Eye, Video as VideoIcon } from 'lucide-react'
+import Avatar from '@/src/components/dashboard/Avatar'
 import type { VideoStatus } from '@/src/types/database'
 
 export interface KepsekVideoRow {
@@ -13,6 +14,7 @@ export interface KepsekVideoRow {
   status: VideoStatus
   created_at: string
   guru_name: string | null
+  guru_avatar_url: string | null
 }
 
 type FilterValue = 'semua' | VideoStatus
@@ -112,7 +114,14 @@ export default function KepsekVideoListClient({ rows }: Props) {
                       <p className="font-body font-medium text-slate-800">{v.title}</p>
                     </td>
                     <td className="px-5 md:px-6 py-4 font-body text-slate-700">
-                      {v.guru_name ?? <span className="text-slate-400">Tidak diketahui</span>}
+                      {v.guru_name ? (
+                        <div className="flex items-center gap-2">
+                          <Avatar name={v.guru_name} avatarUrl={v.guru_avatar_url} size="sm" />
+                          <span>{v.guru_name}</span>
+                        </div>
+                      ) : (
+                        <span className="text-slate-400">Tidak diketahui</span>
+                      )}
                     </td>
                     <td className="px-5 md:px-6 py-4 font-body text-slate-600">
                       {v.subject} · {v.class_name}
