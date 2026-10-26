@@ -134,7 +134,7 @@ export default function NotificationBell() {
   return (
     <div
       ref={containerRef}
-      className={`fixed bottom-4 right-4 z-30 transition-all duration-300 ease-out ${
+      className={`fixed top-4 right-4 z-30 transition-all duration-300 ease-out ${
         isShowingToast
           ? 'opacity-0 scale-90 translate-y-2 pointer-events-none'
           : 'opacity-100 scale-100 translate-y-0'
@@ -159,7 +159,7 @@ export default function NotificationBell() {
       </button>
 
       {open && (
-        <div className="absolute right-0 bottom-12 w-80 sm:w-96 max-h-[70vh] bg-white rounded-xl border border-slate-200 shadow-xl overflow-hidden flex flex-col">
+        <div className="absolute right-0 top-full mt-2 w-80 sm:w-96 max-h-[70vh] bg-white rounded-xl border border-slate-200 shadow-xl overflow-hidden flex flex-col">
           <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
             <div>
               <p className="font-heading text-sm font-bold text-slate-900">Notifikasi</p>

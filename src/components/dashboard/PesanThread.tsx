@@ -372,10 +372,10 @@ export default function PesanThread({
           type="button"
           onClick={handleSend}
           disabled={isPending || !draft.trim()}
-          className="inline-flex items-center justify-center w-10 h-10 rounded-lg text-white bg-[#002147] hover:bg-[#0a3370] disabled:opacity-40 transition shrink-0"
+          className="inline-flex items-center justify-center w-12 h-12 rounded-lg text-white bg-[#002147] hover:bg-[#0a3370] disabled:opacity-40 transition shrink-0"
           aria-label="Kirim pesan"
         >
-          {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+          {isPending ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
         </button>
       </div>
     </div>

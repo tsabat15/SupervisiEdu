@@ -24,7 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="id" className={`${playfair.variable} ${inter.variable} h-full`} suppressHydrationWarning>
       <body className="min-h-full font-body bg-slate-950 text-slate-50 antialiased">
         {children}
-        <Toaster position="bottom-right" richColors />
+        <Toaster position="top-right" richColors />
       </body>
     </html>
   )
