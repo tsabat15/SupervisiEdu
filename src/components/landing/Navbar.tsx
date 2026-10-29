@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import BrandLogo from '@/src/components/BrandLogo'
 
 const navLinks = [
   { label: 'Tentang', href: '#tentang' },
@@ -26,14 +27,7 @@ export default function Navbar() {
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 lg:px-12 flex items-center justify-between h-16">
-        <Link
-          href="/"
-          className={`font-heading text-xl font-bold tracking-wide transition-colors ${
-            scrolled ? 'text-slate-900' : 'text-white'
-          }`}
-        >
-          SupervisiEdu
-        </Link>
+        <BrandLogo dark={scrolled} />
 
         <div className="hidden md:flex items-center gap-8">
           {navLinks.map(({ label, href }) => (

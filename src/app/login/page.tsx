@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
+import BrandLogo from '@/src/components/BrandLogo'
 import { Eye, EyeOff, Loader2 } from 'lucide-react'
 import { createBrowserClient } from '@/src/utils/supabase/client'
 
@@ -43,18 +43,13 @@ export default function LoginPage() {
       {/* ── Kiri: gambar + overlay navy ─────────────────── */}
       <div className="hidden lg:flex lg:w-1/2 relative flex-col">
         <img
-          src="https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=1200&q=80"
-          alt="Supervisi Pendidikan"
-          className="absolute inset-0 w-full h-full object-cover"
-        />
+          src="https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=1200&q=80" alt="Supervisi Pendidikan"className="absolute inset-0 w-full h-full object-cover"/>
         {/* Navy overlay */}
         <div className="absolute inset-0 bg-slate-900/75" />
 
         {/* Konten di atas overlay */}
         <div className="relative z-10 flex flex-col justify-between h-full p-12">
-          <Link href="/" className="font-heading text-xl font-bold text-amber-400 w-fit">
-            SupervisiEdu
-          </Link>
+          <BrandLogo />
 
           <div className="max-w-sm">
             <h1 className="font-heading text-3xl xl:text-4xl font-bold text-white leading-snug mb-4">
@@ -75,12 +70,7 @@ export default function LoginPage() {
         <div className="w-full max-w-sm">
 
           {/* Logo mobile */}
-          <Link
-            href="/"
-            className="lg:hidden block font-heading text-xl font-bold text-slate-900 text-center mb-8"
-          >
-            SupervisiEdu
-          </Link>
+          <BrandLogo dark className="lg:hidden flex justify-center mb-8" />
 
           {/* Heading form */}
           <div className="mb-8">

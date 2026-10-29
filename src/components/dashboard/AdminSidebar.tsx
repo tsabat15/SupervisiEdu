@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { BarChart3, BookOpen, Home, LogOut, Menu, Settings, UserCircle, Users, X } from 'lucide-react'
 import { createBrowserClient } from '@/src/utils/supabase/client'
 import SidebarUserFooter from '@/src/components/dashboard/SidebarUserFooter'
+import BrandLogo from '@/src/components/BrandLogo'
 
 const navItems = [
   { label: 'Beranda', href: '/dashboard/admin', icon: Home },
@@ -69,14 +70,12 @@ export default function AdminSidebar() {
         </button>
 
         <div className="px-7 py-6 border-b border-white/10">
-          <Link href="/dashboard/admin" className="block" onClick={() => setOpen(false)}>
-            <span className="font-heading text-xl font-bold text-amber-400 leading-none">
-              SupervisiEdu
-            </span>
+          <BrandLogo href="/dashboard/admin" onClick={() => setOpen(false)} />
+          <div className="ml-11 -mt-1">
             <p className="font-body text-[11px] text-white/35 mt-1 tracking-wide">
               Panel Administrator
             </p>
-          </Link>
+          </div>
         </div>
 
         <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">

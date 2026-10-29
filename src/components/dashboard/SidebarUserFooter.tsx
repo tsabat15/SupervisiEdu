@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { createBrowserClient } from '@/src/utils/supabase/client'
 import Avatar from '@/src/components/dashboard/Avatar'
+import NotificationBell from '@/src/components/NotificationBell'
 
 interface Props {
   roleLabel: string
@@ -50,14 +51,17 @@ export default function SidebarUserFooter({ roleLabel }: Props) {
   if (!profile) return null
 
   return (
-    <div className="flex items-center gap-2.5 px-3 py-2.5">
-      <Avatar name={profile.full_name} avatarUrl={profile.avatar_url} size="sm" />
-      <div className="min-w-0">
-        <p className="font-body text-xs font-semibold text-white/90 truncate">
-          {profile.full_name}
-        </p>
-        <p className="font-body text-[10px] text-white/40">{roleLabel}</p>
+    <div className="flex items-center justify-between gap-2 px-3 py-2.5">
+      <div className="flex min-w-0 items-center gap-2.5">
+        <Avatar name={profile.full_name} avatarUrl={profile.avatar_url} size="sm" />
+        <div className="min-w-0">
+          <p className="font-body text-xs font-semibold text-white/90 truncate">
+            {profile.full_name}
+          </p>
+          <p className="font-body text-[10px] text-white/40">{roleLabel}</p>
+        </div>
       </div>
+      <NotificationBell />
     </div>
   )
 }

@@ -17,6 +17,10 @@ export const metadata: Metadata = {
   title: 'Sistem Supervisi Pendidikan Terpadu',
   description:
     'Tingkatkan transparansi dan kualitas pendidikan melalui pemantauan data waktu nyata.',
+  icons: {
+    icon: '/icon.png',
+    apple: '/icon.png',
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -24,7 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="id" className={`${playfair.variable} ${inter.variable} h-full`} suppressHydrationWarning>
       <body className="min-h-full font-body bg-slate-950 text-slate-50 antialiased">
         {children}
-        <Toaster position="top-right" richColors />
+        <Toaster position="top-left" richColors />
       </body>
     </html>
   )
